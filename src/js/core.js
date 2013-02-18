@@ -152,10 +152,15 @@ function createGameBoard() {
     return slide(object, 1, 0);
   }
 
+  function getObjects() {
+    return objects;
+  }
+
   return {
     addObject: addObject,
     slideLeft: slideLeft,
-    slideRight: slideRight
+    slideRight: slideRight,
+    getObjects: getObjects
   };
 }
 
@@ -290,7 +295,8 @@ function createWall(x, y) {
   return {
     movable: movable,
     collides: collides,
-    mergable: mergable
+    mergable: mergable,
+    coordinates: coordinates
   };
 }
 

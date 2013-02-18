@@ -7,10 +7,12 @@
   "devDependencies": {
     "jshint": "0.9.1",
     "jasmine-node": "1.0.28",
-    "istanbul": "0.1.27"
+    "istanbul": "0.1.27",
+    "browserify": "1.18.0"
   },
   "scripts": {
-    "pretest": "jshint --config jshint/src.json src && jshint --config jshint/test.json test",
-    "test": "istanbul test jasmine-node -- test"
+    "pretest": "jshint --config jshint/src.json src/js && jshint --config jshint/test.json test",
+    "test": "istanbul test jasmine-node -- test",
+    "posttest": "browserify src/html/wrapper.js -o src/html/bundle.js"
   }
 }
