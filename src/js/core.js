@@ -59,20 +59,41 @@ function createGameBoard() {
     return objectsToMove;
   }
 
-  function move(object, dx, dy) {
-    var objectsToMove = canMove(object, dx, dy);
-    if (objectsToMove.length === 0) {
-      return false;
-    }
-    objectsToMove.forEach(function(object) {
+  function moveObjects(objects, dx, dy) {
+    objects.forEach(function(object) {
       object.move(dx, dy);
     });
-    return true;
+  }
+
+  function fallObjects(objects) {
+    objects.forEach(function(object) {
+      var objectsToMove;
+      do {
+        objectsToMove = canMove(object, 0, 1);
+        moveObjects(objectsToMove, 0, 1);
+      } while(objectsToMove.length !== 0);
+    });
+  }
+
+  function move(object, dx, dy) {
+    var objectsToMove = canMove(object, dx, dy);
+    moveObjects(objectsToMove, dx, dy);
+    fallObjects(objectsToMove);
+    return (objectsToMove.length !== 0);
+  }
+
+  function moveLeft(object) {
+    return move(object, -1, 0);
+  }
+
+  function moveRight(object) {
+    return move(object, 1, 0);
   }
 
   return {
     addObject: addObject,
-    move: move
+    moveLeft: moveLeft,
+    moveRight: moveRight
   };
 }
 
