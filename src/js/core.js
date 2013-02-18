@@ -80,10 +80,67 @@ function createGameBoard() {
     });
   }
 
+  function removeMergedObjects(mergableObjects, objectsToMerge) {
+    return mergableObjects.filter(function(object) {
+      return (objectsToMerge.indexOf(object) === -1);
+    });
+  }
+
+  function mergeObjects(objects, mergeInto) {
+    objects.forEach(function(object) {
+      mergeInto.merge(object);
+    });
+  }
+
+  function canMerge(mergableObjects, index) {
+    var objectsToMerge = [];
+    var object = mergableObjects[index];
+    [{
+      x: -1,
+      y: 0
+    }, {
+      x: 1,
+      y: 0
+    }, {
+      x: 0,
+      y: -1
+    }, {
+      x: 0,
+      y: 1
+    }].forEach(function(delta) {
+      var targetCoordinates = object.targetCoordinates(delta.x, delta.y);
+      for (var i = index + 1; i < mergableObjects.length; i+= 1) {
+        var targetObject = mergableObjects[i];
+        if (targetObject.merges(object, targetCoordinates)) {
+          objectsToMerge.push(targetObject);
+        }
+      }
+    });
+    return objectsToMerge;
+  }
+
+  function mergeAll() {
+    var mergableObjects = objects.filter(function(object) {
+      return object.mergable();
+    });
+    var i = 0;
+    while (i < mergableObjects.length) {
+      var object = mergableObjects[i];
+      var objectsToMerge = canMerge(mergableObjects, i);
+      if (objectsToMerge.length > 0) {
+        mergeObjects(objectsToMerge, object);
+        mergableObjects = removeMergedObjects(mergableObjects, objectsToMerge);
+      } else {
+        i += 1;
+      }
+    }
+  }
+
   function slide(object, dx) {
     var objectsToMove = canMove(object, dx, 0);
     moveObjects(objectsToMove, dx, 0);
     gravity(objectsToMove);
+    mergeAll();
     return (objectsToMove.length !== 0);
   }
 
@@ -102,42 +159,51 @@ function createGameBoard() {
   };
 }
 
-function createJelly(x, y) {
+function createJelly(x, y, color) {
   var jelly;
 
-  var coordinates = [];
-  var attachments = [];
-
   function addCoordinates(x, y) {
-    coordinates.push({
+    jelly.coordinates.push({
       x: x,
       y: y
     });
   }
 
   function affected() {
-    var result = attachments.slice(0);
+    var result = jelly.attachments.slice(0);
     result.push(jelly);
     return result;
   }
 
   function attach(object, notify) {
-    attachments.push(object);
+    addIfMissing([object], jelly.attachments);
     if (notify) {
       object.attach(jelly, false);
     }
   }
 
+  function updateAttachment(oldObject, newObject) {
+    var attachments = [];
+    jelly.attachments.forEach(function(attachment) {
+      if (oldObject === attachment) {
+        addIfMissing([newObject], attachments);
+      } else {
+        addIfMissing([attachment], attachments);
+      }
+    });
+    jelly.attachments = attachments;
+  }
+
   function targetCoordinates(dx, dy) {
-    return transposeCoordinates(coordinates, dx, dy);
+    return transposeCoordinates(jelly.coordinates, dx, dy);
   }
 
   function matches(testCoordinates) {
-    if (testCoordinates.length !== coordinates.length) {
+    if (testCoordinates.length !== jelly.coordinates.length) {
       return false;
     }
     var lookup = {};
-    coordinates.forEach(function(coordinates) {
+    jelly.coordinates.forEach(function(coordinates) {
       lookup[coordinates.x + ':' + coordinates.y] = true;
     });
     var hits = 0;
@@ -146,32 +212,60 @@ function createJelly(x, y) {
         hits += 1;
       }
     });
-    return (hits === coordinates.length);
+    return (hits === jelly.coordinates.length);
   }
 
   function collides(testCoordinates) {
-    return overlappingCoordinates(coordinates, testCoordinates);
+    return overlappingCoordinates(jelly.coordinates, testCoordinates);
+  }
+
+  function merges(object, testCoordinates) {
+    if (object.color !== jelly.color) {
+      return false;
+    }
+    return collides(testCoordinates);
+  }
+
+  function merge(object) {
+    object.coordinates.forEach(function(coordinates) {
+      addCoordinates(coordinates.x, coordinates.y);
+    });
+    addIfMissing(object.attachments, jelly.attachments);
+    object.attachments.forEach(function(attachment) {
+      attachment.updateAttachment(object, jelly);
+    });
+  }
+
+  function mergable() {
+    return true;
   }
 
   function move(dx, dy) {
-    coordinates = transposeCoordinates(coordinates, dx, dy);
+    jelly.coordinates = transposeCoordinates(jelly.coordinates, dx, dy);
   }
 
   function movable() {
     return true;
   }
 
-  addCoordinates(x, y);
   jelly = {
+    coordinates: [],
+    attachments: [],
     affected: affected,
     attach: attach,
+    updateAttachment: updateAttachment,
     addCoordinates: addCoordinates,
     targetCoordinates: targetCoordinates,
     matches: matches,
     movable: movable,
     move: move,
-    collides: collides
+    collides: collides,
+    color: color,
+    mergable: mergable,
+    merge: merge,
+    merges: merges
   };
+  addCoordinates(x, y);
   return jelly;
 }
 
@@ -189,9 +283,14 @@ function createWall(x, y) {
     return false;
   }
 
+  function mergable() {
+    return false;
+  }
+
   return {
     movable: movable,
-    collides: collides
+    collides: collides,
+    mergable: mergable
   };
 }
 
