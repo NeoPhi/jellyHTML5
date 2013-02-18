@@ -48,7 +48,7 @@ function createGameBoard() {
     var objectsToMove = [object];
     while (objectsToTest.length > 0) {
       var objectToTest = objectsToTest.pop();
-      if (!objectToTest.movable) {
+      if (!objectToTest.movable()) {
         return [];
       }
       var targetCoordinates = objectToTest.targetCoordinates(dx, dy);
@@ -99,6 +99,7 @@ function createGameBoard() {
 
 function createJelly(x, y) {
   var coordinates = [];
+  var anchors = [];
 
   function addCoordinates(x, y) {
     coordinates.push({
@@ -107,8 +108,29 @@ function createJelly(x, y) {
     });
   }
 
+  function addAnchor(object) {
+    anchors.push(object);
+  }
+
   function targetCoordinates(dx, dy) {
     return transposeCoordinates(coordinates, dx, dy);
+  }
+
+  function matches(testCoordinates) {
+    if (testCoordinates.length !== coordinates.length) {
+      return false;
+    }
+    var lookup = {};
+    coordinates.forEach(function(coordinates) {
+      lookup[coordinates.x + ':' + coordinates.y] = true;
+    });
+    var hits = 0;
+    testCoordinates.forEach(function(coordinates) {
+      if (lookup[coordinates.x + ':' + coordinates.y]) {
+        hits += 1;
+      }
+    });
+    return (hits === coordinates.length);
   }
 
   function collides(testCoordinates) {
@@ -119,11 +141,19 @@ function createJelly(x, y) {
     coordinates = transposeCoordinates(coordinates, dx, dy);
   }
 
+  function movable() {
+    return anchors.every(function(object) {
+      return object.movable();
+    });
+  }
+
   addCoordinates(x, y);
   return {
+    addAnchor: addAnchor,
     addCoordinates: addCoordinates,
     targetCoordinates: targetCoordinates,
-    movable: true,
+    matches: matches,
+    movable: movable,
     move: move,
     collides: collides
   };
@@ -139,8 +169,12 @@ function createWall(x, y) {
     return overlappingCoordinates(coordinates, testCoordinates);
   }
 
+  function movable() {
+    return false;
+  }
+
   return {
-    movable: false,
+    movable: movable,
     collides: collides
   };
 }
