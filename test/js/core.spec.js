@@ -43,6 +43,24 @@ describe('core', function() {
       }])).toBe(true);
     });
 
+    it('supports funky jellies', function() {
+      jelly.addCoordinates(3, 1);
+      var jelly2 = core.createJelly(2, 1);
+      gameBoard.addObject(jelly2);
+      expect(gameBoard.slideLeft(jelly2)).toBe(true);
+      expect(jelly.matches([{
+        x: 0,
+        y: 1
+      }, {
+        x: 2,
+        y: 1
+      }])).toBe(true);
+      expect(jelly2.matches([{
+        x: 1,
+        y: 1
+      }])).toBe(true);
+    });
+
     it('moves series of anchored jellies', function() {
       var jelly2 = core.createJelly(2, 1);
       jelly2.addCoordinates(3, 1);
