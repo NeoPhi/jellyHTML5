@@ -15,6 +15,14 @@ function overlappingCoordinates(src, dest) {
   });
 }
 
+function addIfMissing(src, dest) {
+  src.forEach(function(object) {
+    if (dest.indexOf(object) === -1) {
+      dest.push(object);
+    }
+  });
+}
+
 function createGameBoard() {
   var objects = [];
 
@@ -35,17 +43,9 @@ function createGameBoard() {
     return collides;
   }
 
-  function addIfMissing(src, dest) {
-    src.forEach(function(object) {
-      if (dest.indexOf(object) === -1) {
-        dest.push(object);
-      }
-    });
-  }
-
   function canMove(object, dx, dy) {
-    var objectsToTest = [object];
-    var objectsToMove = [object];
+    var objectsToTest = object.affected();
+    var objectsToMove = object.affected();
     while (objectsToTest.length > 0) {
       var objectToTest = objectsToTest.pop();
       if (!objectToTest.movable()) {
@@ -65,7 +65,7 @@ function createGameBoard() {
     });
   }
 
-  function fallObjects(objects) {
+  function gravity(objects) {
     objects.forEach(function(object) {
       var objectsToMove;
       do {
@@ -75,31 +75,33 @@ function createGameBoard() {
     });
   }
 
-  function move(object, dx, dy) {
-    var objectsToMove = canMove(object, dx, dy);
-    moveObjects(objectsToMove, dx, dy);
-    fallObjects(objectsToMove);
+  function slide(object, dx) {
+    var objectsToMove = canMove(object, dx, 0);
+    moveObjects(objectsToMove, dx, 0);
+    gravity(objectsToMove);
     return (objectsToMove.length !== 0);
   }
 
-  function moveLeft(object) {
-    return move(object, -1, 0);
+  function slideLeft(object) {
+    return slide(object, -1, 0);
   }
 
-  function moveRight(object) {
-    return move(object, 1, 0);
+  function slideRight(object) {
+    return slide(object, 1, 0);
   }
 
   return {
     addObject: addObject,
-    moveLeft: moveLeft,
-    moveRight: moveRight
+    slideLeft: slideLeft,
+    slideRight: slideRight
   };
 }
 
 function createJelly(x, y) {
+  var jelly;
+
   var coordinates = [];
-  var anchors = [];
+  var attachments = [];
 
   function addCoordinates(x, y) {
     coordinates.push({
@@ -108,8 +110,17 @@ function createJelly(x, y) {
     });
   }
 
-  function addAnchor(object) {
-    anchors.push(object);
+  function affected() {
+    var result = attachments.slice(0);
+    result.push(jelly);
+    return result;
+  }
+
+  function attach(object, notify) {
+    attachments.push(object);
+    if (notify) {
+      object.attach(jelly, false);
+    }
   }
 
   function targetCoordinates(dx, dy) {
@@ -142,14 +153,13 @@ function createJelly(x, y) {
   }
 
   function movable() {
-    return anchors.every(function(object) {
-      return object.movable();
-    });
+    return true;
   }
 
   addCoordinates(x, y);
-  return {
-    addAnchor: addAnchor,
+  jelly = {
+    affected: affected,
+    attach: attach,
     addCoordinates: addCoordinates,
     targetCoordinates: targetCoordinates,
     matches: matches,
@@ -157,6 +167,7 @@ function createJelly(x, y) {
     move: move,
     collides: collides
   };
+  return jelly;
 }
 
 function createWall(x, y) {
