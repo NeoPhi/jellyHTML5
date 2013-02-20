@@ -32,9 +32,25 @@ function construct() {
   return gameBoard;
 }
 
+// https://developer.mozilla.org/en-US/docs/HTML/Canvas/Tutorial/Drawing_shapes
+
+function roundedRect(context, x, y, width, height, radius){
+  context.beginPath();
+  context.moveTo(x,y+radius);
+  context.lineTo(x,y+height-radius);
+  context.quadraticCurveTo(x,y+height,x+radius,y+height);
+  context.lineTo(x+width-radius,y+height);
+  context.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);
+  context.lineTo(x+width,y+radius);
+  context.quadraticCurveTo(x+width,y,x+width-radius,y);
+  context.lineTo(x+radius,y);
+  context.quadraticCurveTo(x,y,x,y+radius);
+  context.fill();
+}
+
 function drawObject(object, context) {
   object.coordinates.forEach(function(coordinates) {
-    context.fillRect(coordinates.x * 40, coordinates.y * 40, 40, 40);
+    roundedRect(context, coordinates.x * 40 + 1, coordinates.y * 40 + 1, 38, 38, 10);
   });
 }
 
