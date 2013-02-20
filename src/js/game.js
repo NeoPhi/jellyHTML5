@@ -19,29 +19,49 @@ var levels = [
     'x   r r   r  x',
     'xxxxx x x xxxx',
     'xxxxxxxxxxxxxx'
+  ], [
+    'xxxxxxxxxxxxxx',
+    'x            x',
+    'x            x',
+    'x   bg  x g  x',
+    'xxx xxxrxxx  x',
+    'x      b     x',
+    'xxx xxxrxxxxxx',
+    'xxxxxxxxxxxxxx'
+  ], [
+    'xxxxxxxxxxxxxx',
+    'x            x',
+    'x       r    x',
+    'x       b    x',
+    'x       x    x',
+    'x b r        x',
+    'x b r      b x',
+    'xxx x      xxx',
+    'xxxxx xxxxxxxx',
+    'xxxxxxxxxxxxxx'
+  ], [
+    'xxxxxxxxxxxxxx',
+    'x            x',
+    'x            x',
+    'xrg  gg      x',
+    'xxx xxxx xx  x',
+    'xrg          x',
+    'xxxxx  xx   xx',
+    'xxxxxx xx  xxx',
+    'xxxxxxxxxxxxxx'
+  ], [
+    'xxxxxxxxxxxxxx',
+    'xxxxxxx      x',
+    'xxxxxxx g    x',
+    'x       xx   x',
+    'x r   b      x',
+    'x x xxx x g  x',
+    'x         x bx',
+    'x       r xxxx',
+    'x   xxxxxxxxxx',
+    'xxxxxxxxxxxxxx'
   ]
 ];
-
-function constructRow(row, y, gameBoard) {
-  var parts = row.split(/(?:)/);
-  parts.forEach(function(letter, x) {
-    if (letter === ' ') {
-      return;
-    }
-    if (letter === 'x') {
-      return gameBoard.addObject(core.createWall(x, y));
-    }
-    gameBoard.addObject(core.createJelly(x, y, letter));
-  });
-}
-
-function construct(level) {
-  var gameBoard = core.createGameBoard();
-  level.forEach(function(row, y) {
-    constructRow(row, y, gameBoard);
-  });
-  return gameBoard;
-}
 
 // https://developer.mozilla.org/en-US/docs/HTML/Canvas/Tutorial/Drawing_shapes
 
@@ -66,7 +86,7 @@ function drawObject(object, context) {
 }
 
 function drawGameBoard(gameBoard, context) {
-  context.clearRect(0, 0, 560, 320);
+  context.clearRect(0, 0, 560, 400);
   gameBoard.getObjects().forEach(function(object) {
     if (object.color) {
       if (object.color === 'r') {
@@ -139,12 +159,38 @@ function slideObject(document, gameBoard, event, left, context) {
   }
 }
 
-function doIt(document) {
-  var gameBoard = construct(levels[0]);
+function constructRow(row, y, gameBoard) {
+  var parts = row.split(/(?:)/);
+  parts.forEach(function(letter, x) {
+    if (letter === ' ') {
+      return;
+    }
+    if (letter === 'x') {
+      return gameBoard.addObject(core.createWall(x, y));
+    }
+    gameBoard.addObject(core.createJelly(x, y, letter));
+  });
+}
 
+function construct(document, context) {
+  var selector = document.getElementById('levels');
+  var level = levels[selector.value || 0];
+  // TODO Level parsing should be part of core
+  var gameBoard = core.createGameBoard();
+  level.forEach(function(row, y) {
+    constructRow(row, y, gameBoard);
+  });
+  gameBoard.postSetup();
+  drawGameBoard(gameBoard, context);
+  setStatus(document, '');
+  return gameBoard;
+}
+
+function doIt(document) {
   var drawingCanvas = document.getElementById('board');
   if (drawingCanvas.getContext) {
     var context = drawingCanvas.getContext('2d');
+    var gameBoard = construct(document, context);
     drawGameBoard(gameBoard, context);
     drawingCanvas.addEventListener('click', function(event) {
       slideObject(document, gameBoard, event, true, context);
@@ -161,10 +207,13 @@ function doIt(document) {
       selector.appendChild(option);
     });
     selector.addEventListener('change', function() {
-      gameBoard = construct(levels[selector.value]);
-      drawGameBoard(gameBoard, context);
-      setStatus(document, '');
+      gameBoard = construct(document, context);
     });
+    document.getElementById('reset').addEventListener('click', function() {
+      gameBoard = construct(document, context);
+    });
+  } else {
+    setStatus(document, 'Unable to get drawing context');
   }
 }
 

@@ -26,7 +26,8 @@
     "afterEach": false,
     "expect": false,
     "it": false,
-    "describe": false
+    "describe": false,
+    "spyOn": false
    },
 
   // ************************************************************

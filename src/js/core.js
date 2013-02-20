@@ -1,3 +1,6 @@
+// TODO Rework API, tie everything to game board instead of having
+// separate objects and instead expose create/update methods on
+// game board directly
 function transposeCoordinates(coordinates, dx, dy) {
   return coordinates.map(function(coordinates) {
     return {
@@ -70,8 +73,11 @@ function createGameBoard() {
     });
   }
 
-  function gravity(objects) {
-    objects.forEach(function(object) {
+  function gravityAll() {
+    var movableObjects = objects.filter(function(object) {
+      return object.mergable();
+    });
+    movableObjects.forEach(function(object) {
       var objectsToMove;
       do {
         objectsToMove = canMove(object, 0, 1);
@@ -130,7 +136,6 @@ function createGameBoard() {
       if (objectsToMerge.length > 0) {
         mergeObjects(objectsToMerge, object);
         mergableObjects = removeMergedObjects(mergableObjects, objectsToMerge);
-        // TODO failing unit test for why this line was needed
         objects = removeMergedObjects(objects, objectsToMerge);
       } else {
         i += 1;
@@ -141,8 +146,7 @@ function createGameBoard() {
   function slide(object, dx) {
     var objectsToMove = canMove(object, dx, 0);
     moveObjects(objectsToMove, dx, 0);
-    // BUG: Need to apply gravity all objects
-    gravity(objectsToMove);
+    gravityAll();
     mergeAll();
     return (objectsToMove.length !== 0);
   }
@@ -155,6 +159,11 @@ function createGameBoard() {
     return slide(object, 1, 0);
   }
 
+  function postSetup() {
+    gravityAll();
+    mergeAll();
+  }
+
   function getObjects() {
     return objects;
   }
@@ -163,6 +172,7 @@ function createGameBoard() {
     addObject: addObject,
     slideLeft: slideLeft,
     slideRight: slideRight,
+    postSetup: postSetup,
     getObjects: getObjects
   };
 }
