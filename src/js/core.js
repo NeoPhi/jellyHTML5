@@ -130,6 +130,8 @@ function createGameBoard() {
       if (objectsToMerge.length > 0) {
         mergeObjects(objectsToMerge, object);
         mergableObjects = removeMergedObjects(mergableObjects, objectsToMerge);
+        // TODO failing unit test for why this line was needed
+        objects = removeMergedObjects(objects, objectsToMerge);
       } else {
         i += 1;
       }
@@ -139,6 +141,7 @@ function createGameBoard() {
   function slide(object, dx) {
     var objectsToMove = canMove(object, dx, 0);
     moveObjects(objectsToMove, dx, 0);
+    // BUG: Need to apply gravity all objects
     gravity(objectsToMove);
     mergeAll();
     return (objectsToMove.length !== 0);
