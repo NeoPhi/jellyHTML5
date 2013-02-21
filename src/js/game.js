@@ -134,7 +134,7 @@ function roundedRect(context, x, y, width, height, radius){
   context.fill();
 }
 
-function connect(object, lookup, context) {
+function drawConnections(object, lookup, context) {
   object.coordinates.forEach(function(coordinates) {
     var x = coordinates.x;
     var y = coordinates.y;
@@ -144,6 +144,56 @@ function connect(object, lookup, context) {
     if (lookup[x + ',' + (y + 1)]) {
       context.fillRect(x * 40 + 1, (y + 1) * 40 - 10, 38, 20);
     }
+  });
+}
+
+function setFillStyle(color, context) {
+  if (color === 'r') {
+    context.fillStyle = 'rgb(255,0,0)';
+  } else if (color === 'g') {
+    context.fillStyle = 'rgb(0,255,0)';
+  } else if (color === 'b') {
+    context.fillStyle = 'rgb(0,0,255)';
+  } else if (color === 'y') {
+    context.fillStyle = 'rgb(256,208,32)';
+  } else if (color.charAt(0) === 'l') {
+    context.fillStyle = 'rgb(128,0,128)';
+  } else {
+    throw new Error('Unknown color: ' + color);
+  }
+}
+
+function drawAttachment(object, context) {
+  setFillStyle(object.color, context);
+  object.coordinates.forEach(function(coordinates) {
+    var x = coordinates.x;
+    var y = coordinates.y;
+    object.attachments.forEach(function(attachment) {
+      if (attachment.collides([{
+        x: x + 1,
+        y: y
+      }])) {
+        context.fillRect((x + 1) * 40 - 5, y * 40 + 15, 15, 10);
+      }
+      if (attachment.collides([{
+        x: x - 1,
+        y: y
+      }])) {
+        context.fillRect(x * 40 - 10, y * 40 + 15, 15, 10);
+      }
+      if (attachment.collides([{
+        x: x,
+        y: y + 1
+      }])) {
+        context.fillRect(x * 40 + 15, (y + 1) * 40 - 5, 10, 15);
+      }
+      if (attachment.collides([{
+        x: x,
+        y: y - 1
+      }])) {
+        context.fillRect(x * 40 + 15, y * 40 - 10, 10, 15);
+      }
+    });
   });
 }
 
@@ -157,7 +207,7 @@ function drawObject(object, lookup, doConnect, context) {
     roundedRect(context, x * 40 + 1, y * 40 + 1, 38, 38, 10);
   });
   if (doConnect) {
-    connect(object, lookup, context);
+    drawConnections(object, lookup, context);
   }
 }
 
@@ -169,19 +219,7 @@ function drawGameBoard(gameBoard, context) {
     var lookup = {};
     var doConnect = true;
     if (object.color) {
-      if (object.color === 'r') {
-        context.fillStyle = 'rgb(255,0,0)';
-      } else if (object.color === 'g') {
-        context.fillStyle = 'rgb(0,255,0)';
-      } else if (object.color === 'b') {
-        context.fillStyle = 'rgb(0,0,255)';
-      } else if (object.color === 'y') {
-        context.fillStyle = 'rgb(256,208,32)';
-      } else if (object.color.charAt(0) === 'l') {
-        context.fillStyle = 'rgb(128,0,128)';
-      } else {
-        throw new Error('Unknown color: ' + object.color);
-      }
+      setFillStyle(object.color, context);
     } else {
       context.fillStyle = 'rgb(128,128,128)';
       lookup = wallLookup;
@@ -191,7 +229,16 @@ function drawGameBoard(gameBoard, context) {
     drawObject(object, lookup, doConnect, context);
   });
   walls.forEach(function(wall) {
-    connect(wall, wallLookup, context);
+    drawConnections(wall, wallLookup, context);
+  });
+  gameBoard.getObjects().forEach(function(object) {
+    if (!object.attachments || (object.attachments.length === 0)) {
+      return;
+    }
+    if (object.color.charAt(0) === 'l') {
+      return;
+    }
+    drawAttachment(object, context);
   });
 }
 
@@ -229,6 +276,7 @@ function slideObject(document, gameBoard, event, left, context) {
     x: x,
     y: y
   }];
+  // console.log('    createClick(' + x + ', ' + y + ', ' + left + '),');
   var objects = gameBoard.getObjects();
   for (var i = 0; i < objects.length; i += 1) {
     var object = objects[i];
