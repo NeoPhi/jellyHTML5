@@ -71,6 +71,39 @@ var levels = [
     'x   rb    bbx   x   x     x ',
     'x   x     x x   x   x     x ',
     'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x x x x   x     x   x x x x ',
+    'x x x     g     b     x x x ',
+    'x x       x     x       x x ',
+    'x x       bt    gt      x x ',
+    'x x g                 b x x ',
+    'x x x g             b x x x ',
+    'x x x x             x x x x ',
+    'x x x x x x x x x x x x x x ',
+    'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x                         x ',
+    'x                         x ',
+    'x                         x ',
+    'x                     r b x ',
+    'x         x           x x x ',
+    'x b                 l l x x ',
+    'x x     rbx     x   x x x x ',
+    'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x       g r               x ',
+    'x       l0l0  l1          x ',
+    'x         x   x   x x x x x ',
+    'x                         x ',
+    'x     x     x             x ',
+    'x                 x     rbx ',
+    'x x       x           gbx x ',
+    'x                     x x x ',
+    'x x x x x x x x x x x x x x '
   ]
 ];
 
@@ -104,8 +137,12 @@ function drawGameBoard(gameBoard, context) {
         context.fillStyle = 'rgb(255,0,0)';
       } else if (object.color === 'g') {
         context.fillStyle = 'rgb(0,255,0)';
-      } else {
+      } else if (object.color === 'b') {
         context.fillStyle = 'rgb(0,0,255)';
+      } else if (object.color.charAt(0) === 'l') {
+        context.fillStyle = 'rgb(128,0,128)';
+      } else {
+        throw new Error('Unknown color: ' + object.color);
       }
     } else {
       context.fillStyle = 'rgb(128,128,128)';
@@ -182,6 +219,9 @@ function constructRow(row, y, gameBoard, objects, attachments) {
     var object;
     if (letter === 'x') {
       object = core.createWall(x, y);
+    } else if (letter === 'l') {
+      object = core.createJelly(x, y, letter + control);
+      control = ' ';
     } else {
       object = core.createJelly(x, y, letter);
     }

@@ -75,7 +75,7 @@ function createGameBoard() {
 
   function gravityAll() {
     var movableObjects = objects.filter(function(object) {
-      return object.mergable();
+      return object.movable();
     });
     movableObjects.forEach(function(object) {
       var objectsToMove;
