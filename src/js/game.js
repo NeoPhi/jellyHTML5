@@ -273,10 +273,30 @@ function construct(document, context) {
   return gameBoard;
 }
 
-function doIt(document) {
+function doIt(document, window) {
   var drawingCanvas = document.getElementById('board');
   if (drawingCanvas.getContext) {
     var context = drawingCanvas.getContext('2d');
+    var initialLevel = 0;
+    if (window.location.hash) {
+      initialLevel = parseInt(window.location.hash.substring(1), 10);
+    }
+
+    var selector = document.getElementById('levels');
+    levels.forEach(function(level, i) {
+      var option = document.createElement('option');
+      if (i === initialLevel) {
+        option.selected = true;
+      }
+      option.value = i;
+      option.text = 'Level ' + (i + 1);
+      selector.appendChild(option);
+    });
+    selector.addEventListener('change', function() {
+      window.location.hash = '#' + selector.value;
+      gameBoard = construct(document, context);
+    });
+
     var gameBoard = construct(document, context);
     drawGameBoard(gameBoard, context);
     drawingCanvas.addEventListener('click', function(event) {
@@ -286,16 +306,6 @@ function doIt(document) {
       slideObject(document, gameBoard, event, false, context);
     });
 
-    var selector = document.getElementById('levels');
-    levels.forEach(function(level, i) {
-      var option = document.createElement('option');
-      option.value = i;
-      option.text = 'Level ' + (i + 1);
-      selector.appendChild(option);
-    });
-    selector.addEventListener('change', function() {
-      gameBoard = construct(document, context);
-    });
     document.getElementById('reset').addEventListener('click', function() {
       gameBoard = construct(document, context);
     });

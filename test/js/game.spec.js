@@ -3,6 +3,7 @@ describe('game.js', function() {
   var core = require('../../src/js/core');
 
   var document;
+  var window;
   var board;
   var context;
   var levels;
@@ -27,7 +28,7 @@ describe('game.js', function() {
     spyOn(status, 'appendChild').andCallThrough();
     levels.value = level;
 
-    game.doIt(document);
+    game.doIt(document, window);
 
     clicks.forEach(function(click) {
       var event = {
@@ -106,16 +107,20 @@ describe('game.js', function() {
         };
       }
     };
+
+    window = {
+      location: {}
+    };
   });
 
   it('creates initial level', function() {
-    game.doIt(document);
+    game.doIt(document, window);
     expect(gameBoard.addObject.callCount).toBe(57);
   });
 
   it('creates complex level', function() {
     levels.value = 6;
-    game.doIt(document);
+    game.doIt(document, window);
     expect(gameBoard.addObject.callCount).toBe(62);
   });
 
