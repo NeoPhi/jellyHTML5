@@ -61,7 +61,8 @@ describe('game.js', function() {
       moveTo: function() {},
       lineTo: function() {},
       quadraticCurveTo: function() {},
-      fill: function() {}
+      fill: function() {},
+      fillRect: function() {}
     };
 
     board = {

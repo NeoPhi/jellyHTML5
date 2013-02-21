@@ -104,6 +104,17 @@ var levels = [
     'x x       x           gbx x ',
     'x                     x x x ',
     'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x             yrl0l0yl  y x ',
+    'x               x x x   x x ',
+    'x                       y x ',
+    'x l1l1                  x x ',
+    'x x x                     x ',
+    'x               y         x ',
+    'x       x   x x x       ybx ',
+    'x       x x x x x x   x x x ',
+    'x x x x x x x x x x x x x x '
   ]
 ];
 
@@ -111,27 +122,52 @@ var levels = [
 
 function roundedRect(context, x, y, width, height, radius){
   context.beginPath();
-  context.moveTo(x,y+radius);
-  context.lineTo(x,y+height-radius);
-  context.quadraticCurveTo(x,y+height,x+radius,y+height);
-  context.lineTo(x+width-radius,y+height);
-  context.quadraticCurveTo(x+width,y+height,x+width,y+height-radius);
-  context.lineTo(x+width,y+radius);
-  context.quadraticCurveTo(x+width,y,x+width-radius,y);
-  context.lineTo(x+radius,y);
-  context.quadraticCurveTo(x,y,x,y+radius);
+  context.moveTo(x, y + radius);
+  context.lineTo(x, y + height - radius);
+  context.quadraticCurveTo(x, y + height, x + radius, y + height);
+  context.lineTo(x + width - radius, y + height);
+  context.quadraticCurveTo(x + width, y + height, x + width, y + height - radius);
+  context.lineTo(x + width, y + radius);
+  context.quadraticCurveTo(x + width, y, x + width - radius, y);
+  context.lineTo(x + radius,y);
+  context.quadraticCurveTo(x, y, x, y + radius);
   context.fill();
 }
 
-function drawObject(object, context) {
+function connect(object, lookup, context) {
   object.coordinates.forEach(function(coordinates) {
-    roundedRect(context, coordinates.x * 40 + 1, coordinates.y * 40 + 1, 38, 38, 10);
+    var x = coordinates.x;
+    var y = coordinates.y;
+    if (lookup[(x + 1) + ',' + y]) {
+      context.fillRect((x + 1) * 40 - 10, y * 40 + 1, 20, 38);
+    }
+    if (lookup[x + ',' + (y + 1)]) {
+      context.fillRect(x * 40 + 1, (y + 1) * 40 - 10, 38, 20);
+    }
   });
+}
+
+function drawObject(object, lookup, doConnect, context) {
+  object.coordinates.forEach(function(coordinates) {
+    lookup[coordinates.x + ',' + coordinates.y] = true;
+  });
+  object.coordinates.forEach(function(coordinates) {
+    var x = coordinates.x;
+    var y = coordinates.y;
+    roundedRect(context, x * 40 + 1, y * 40 + 1, 38, 38, 10);
+  });
+  if (doConnect) {
+    connect(object, lookup, context);
+  }
 }
 
 function drawGameBoard(gameBoard, context) {
   context.clearRect(0, 0, 560, 400);
+  var walls = [];
+  var wallLookup = {};
   gameBoard.getObjects().forEach(function(object) {
+    var lookup = {};
+    var doConnect = true;
     if (object.color) {
       if (object.color === 'r') {
         context.fillStyle = 'rgb(255,0,0)';
@@ -139,6 +175,8 @@ function drawGameBoard(gameBoard, context) {
         context.fillStyle = 'rgb(0,255,0)';
       } else if (object.color === 'b') {
         context.fillStyle = 'rgb(0,0,255)';
+      } else if (object.color === 'y') {
+        context.fillStyle = 'rgb(256,208,32)';
       } else if (object.color.charAt(0) === 'l') {
         context.fillStyle = 'rgb(128,0,128)';
       } else {
@@ -146,8 +184,14 @@ function drawGameBoard(gameBoard, context) {
       }
     } else {
       context.fillStyle = 'rgb(128,128,128)';
+      lookup = wallLookup;
+      doConnect = false;
+      walls.push(object);
     }
-    drawObject(object, context);
+    drawObject(object, lookup, doConnect, context);
+  });
+  walls.forEach(function(wall) {
+    connect(wall, wallLookup, context);
   });
 }
 
