@@ -77,9 +77,16 @@ describe('game.js', function() {
     };
   });
 
-  it('creates initial state', function() {
+  it('creates initial level', function() {
     spyOn(gameBoard, 'addObject').andCallThrough();
     game.doIt(document);
     expect(gameBoard.addObject.callCount).toBe(57);
+  });
+
+  it('creates complex level', function() {
+    levels.value = 6;
+    spyOn(gameBoard, 'addObject').andCallThrough();
+    game.doIt(document);
+    expect(gameBoard.addObject.callCount).toBe(62);
   });
 });

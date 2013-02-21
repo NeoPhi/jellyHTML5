@@ -160,8 +160,9 @@ function createGameBoard() {
   }
 
   function postSetup() {
-    gravityAll();
+    // Better define this logic
     mergeAll();
+    gravityAll();
   }
 
   function getObjects() {
@@ -250,7 +251,10 @@ function createJelly(x, y, color) {
     });
     addIfMissing(object.attachments, jelly.attachments);
     object.attachments.forEach(function(attachment) {
-      attachment.updateAttachment(object, jelly);
+      // TODO add unit test around need for this check
+      if (attachment.updateAttachment) {
+        attachment.updateAttachment(object, jelly);
+      }
     });
   }
 

@@ -2,64 +2,75 @@ var core = require('./core');
 
 var levels = [
   [
-    'xxxxxxxxxxxxxx',
-    'x            x',
-    'x            x',
-    'x      r     x',
-    'x      xx    x',
-    'x  g     r b x',
-    'xxbxxxg xxxxxx',
-    'xxxxxxxxxxxxxx'
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x                         x ',
+    'x             r           x ',
+    'x             x x         x ',
+    'x     g           r   b   x ',
+    'x x b x x x g   x x x x x x ',
+    'x x x x x x x x x x x x x x '
   ], [
-    'xxxxxxxxxxxxxx',
-    'x            x',
-    'x            x',
-    'x            x',
-    'x     g   g  x',
-    'x   r r   r  x',
-    'xxxxx x x xxxx',
-    'xxxxxxxxxxxxxx'
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x                         x ',
+    'x                         x ',
+    'x           g       g     x ',
+    'x       r   r       r     x ',
+    'x x x x x   x   x   x x x x ',
+    'x x x x x x x x x x x x x x '
   ], [
-    'xxxxxxxxxxxxxx',
-    'x            x',
-    'x            x',
-    'x   bg  x g  x',
-    'xxx xxxrxxx  x',
-    'x      b     x',
-    'xxx xxxrxxxxxx',
-    'xxxxxxxxxxxxxx'
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x                         x ',
+    'x       b g     x   g     x ',
+    'x x x   x x x r x x x     x ',
+    'x             b           x ',
+    'x x x   x x x r x x x x x x ',
+    'x x x x x x x x x x x x x x '
   ], [
-    'xxxxxxxxxxxxxx',
-    'x            x',
-    'x       r    x',
-    'x       b    x',
-    'x       x    x',
-    'x b r        x',
-    'x b r      b x',
-    'xxx x      xxx',
-    'xxxxx xxxxxxxx',
-    'xxxxxxxxxxxxxx'
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x               r         x ',
+    'x               b         x ',
+    'x               x         x ',
+    'x   b   r                 x ',
+    'x   b   r             b   x ',
+    'x x x   x             x x x ',
+    'x x x x x   x x x x x x x x ',
+    'x x x x x x x x x x x x x x '
   ], [
-    'xxxxxxxxxxxxxx',
-    'x            x',
-    'x            x',
-    'xrg  gg      x',
-    'xxx xxxx xx  x',
-    'xrg          x',
-    'xxxxx  xx   xx',
-    'xxxxxx xx  xxx',
-    'xxxxxxxxxxxxxx'
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x                         x ',
+    'x r g     g g             x ',
+    'x x x   x x x x   x x     x ',
+    'x r g                     x ',
+    'x x x x x     x x       x x ',
+    'x x x x x x   x x     x x x ',
+    'x x x x x x x x x x x x x x '
   ], [
-    'xxxxxxxxxxxxxx',
-    'xxxxxxx      x',
-    'xxxxxxx g    x',
-    'x       xx   x',
-    'x r   b      x',
-    'x x xxx x g  x',
-    'x         x bx',
-    'x       r xxxx',
-    'x   xxxxxxxxxx',
-    'xxxxxxxxxxxxxx'
+    'x x x x x x x x x x x x x x ',
+    'x x x x x x x             x ',
+    'x x x x x x x   g         x ',
+    'x               x x       x ',
+    'x   r       b             x ',
+    'x   x   x x x   x   g     x ',
+    'x                   x   b x ',
+    'x               r   x x x x ',
+    'x       x x x x x x x x x x ',
+    'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x                     r   x ',
+    'x                     x   x ',
+    'x           b       b     x ',
+    'x           x     r r     x ',
+    'x                   x     x ',
+    'x   rb    bbx   x   x     x ',
+    'x   x     x x   x   x     x ',
+    'x x x x x x x x x x x x x x '
   ]
 ];
 
@@ -159,17 +170,45 @@ function slideObject(document, gameBoard, event, left, context) {
   }
 }
 
-function constructRow(row, y, gameBoard) {
+function constructRow(row, y, gameBoard, objects, attachments) {
   var parts = row.split(/(?:)/);
-  parts.forEach(function(letter, x) {
+  for (var i = 0; i < parts.length; i += 2) {
+    var letter = parts[i];
+    var control = parts[i + 1];
+    var x = Math.floor(i / 2);
     if (letter === ' ') {
-      return;
+      continue;
     }
+    var object;
     if (letter === 'x') {
-      return gameBoard.addObject(core.createWall(x, y));
+      object = core.createWall(x, y);
+    } else {
+      object = core.createJelly(x, y, letter);
     }
-    gameBoard.addObject(core.createJelly(x, y, letter));
-  });
+    gameBoard.addObject(object);
+    objects[x + ',' + y] = object;
+    if (control === ' ') {
+      continue;
+    }
+    var dx = 0;
+    var dy = 0;
+    if (control === 't') {
+      dy = -1;
+    }
+    if (control === 'r') {
+      dx = 1;
+    }
+    if (control === 'b') {
+      dy = 1;
+    }
+    if (control === 'l') {
+      dx = -1;
+    }
+    attachments.push({
+      src: x + ',' + y,
+      dest: (x + dx) + ',' + (y + dy)
+    });
+  }
 }
 
 function construct(document, context) {
@@ -177,8 +216,16 @@ function construct(document, context) {
   var level = levels[selector.value || 0];
   // TODO Level parsing should be part of core
   var gameBoard = core.createGameBoard();
+  var objects = {};
+  var attachments = [];
   level.forEach(function(row, y) {
-    constructRow(row, y, gameBoard);
+    constructRow(row, y, gameBoard, objects, attachments);
+  });
+  attachments.forEach(function(attachment) {
+    var src = objects[attachment.src];
+    var dest = objects[attachment.dest];
+    // TODO this should be handled by attachment method
+    src.attach(dest, dest.movable());
   });
   gameBoard.postSetup();
   drawGameBoard(gameBoard, context);
