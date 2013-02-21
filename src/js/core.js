@@ -47,8 +47,8 @@ function createGameBoard() {
   }
 
   function canMove(object, dx, dy) {
-    var objectsToTest = object.affected();
-    var objectsToMove = object.affected();
+    var objectsToTest = [object];
+    var objectsToMove = [];
     var objectsTested = [];
     while (objectsToTest.length > 0) {
       var objectToTest = objectsToTest.pop();
@@ -59,6 +59,9 @@ function createGameBoard() {
         continue;
       }
       objectsTested.push(objectToTest);
+      var affected = objectToTest.affected();
+      addIfMissing(affected, objectsToTest);
+      addIfMissing(affected, objectsToMove);
       var targetCoordinates = objectToTest.targetCoordinates(dx, dy);
       var hits = collidesWith(targetCoordinates, objectToTest);
       addIfMissing(hits, objectsToTest);

@@ -364,8 +364,7 @@ describe('game.js', function() {
       createClick(6, 6, true),
       createClick(6, 7, false),
       createClick(5, 2, false),
-      // TODO: this should be 6, 5
-      createClick(6, 6, false),
+      createClick(6, 5, false),
       createClick(7, 6, false)
     ];
     playLevel(7, clicks);

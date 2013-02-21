@@ -127,6 +127,25 @@ describe('core', function() {
       }])).toBe(true);
     });
 
+    it('does not move series of anchored jellies', function() {
+      var wall2  = core.createWall(1, 0);
+      gameBoard.addObject(wall2);
+      jelly.attach(wall2);
+
+      var jelly2 = core.createJelly(2, 1, 'b');
+      gameBoard.addObject(jelly2);
+
+      expect(gameBoard.slideLeft(jelly2)).toBe(false);
+      expect(jelly.matches([{
+        x: 1,
+        y: 1
+      }])).toBe(true);
+      expect(jelly2.matches([{
+        x: 2,
+        y: 1
+      }])).toBe(true);
+    });
+
     it('moves anchored jelly attached to jelly', function() {
       var jelly2 = core.createJelly(1, 0, 'b');
       gameBoard.addObject(jelly2);
