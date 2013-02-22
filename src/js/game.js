@@ -287,7 +287,7 @@ function slideObject(document, gameBoard, event, left, context) {
     x: x,
     y: y
   }];
-  // console.log('    createClick(' + x + ', ' + y + ', ' + left + '),');
+  // console.log('      createClick(' + x + ', ' + y + ', ' + left + '),');
   var objects = gameBoard.getObjects();
   for (var i = 0; i < objects.length; i += 1) {
     var object = objects[i];
