@@ -115,6 +115,17 @@ var levels = [
     'x       x   x x x       ybx ',
     'x       x x x x x x   x x x ',
     'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x x r   r r     r r   r x x ',
+    'x x x     x     x     x x x ',
+    'x                         x ',
+    'x b                     bbx ',
+    'x x                     x x ',
+    'x                         x ',
+    'x                         x ',
+    'x       x x x x x x       x ',
+    'x x x x x x x x x x x x x x '
   ]
 ];
 
