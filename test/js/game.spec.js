@@ -506,4 +506,15 @@ describe('game.js', function() {
     ];
     playLevel(11, clicks);
   });
+
+  it('plays level 13', function() {
+    var clicks = [
+      createClick(7, 3, false),
+      createClick(6, 6, true),
+      createClick(7, 5, false),
+      createClick(7, 4, true),
+      createClick(6, 4, true)
+    ];
+    playLevel(12, clicks);
+  });
 });
