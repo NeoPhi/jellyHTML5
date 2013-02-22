@@ -622,4 +622,29 @@ describe('game.js', function() {
     ];
     playLevel(14, clicks);
   });
+
+  it('plays level 16', function() {
+    var clicks = [
+      createClick(7, 3, true),
+      createClick(8, 2, true),
+      createClick(7, 2, true),
+      createClick(6, 4, true),
+      createClick(5, 4, true),
+      createClick(6, 8, true),
+      createClick(5, 8, true),
+      createClick(12, 1, true),
+      createClick(11, 2, true),
+      createClick(10, 3, true),
+      createClick(9, 3, true),
+      createClick(8, 3, true),
+      createClick(4, 4, false),
+      createClick(5, 4, false),
+      createClick(7, 3, true),
+      createClick(6, 3, true),
+      createClick(5, 4, true),
+      createClick(4, 5, true),
+      createClick(3, 5, true)
+    ];
+    playLevel(15, clicks);
+  });
 });
