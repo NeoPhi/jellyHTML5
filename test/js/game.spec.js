@@ -581,4 +581,45 @@ describe('game.js', function() {
     ];
     playLevel(13, clicks);
   });
+
+  it('plays level 15', function() {
+    var clicks = [
+      createClick(12, 2, true),
+      createClick(11, 3, true),
+      createClick(12, 2, true),
+      createClick(11, 3, true),
+      createClick(9, 4, true),
+      createClick(10, 3, true),
+      createClick(9, 4, true),
+      createClick(5, 1, true),
+      createClick(3, 1, true),
+      createClick(2, 3, false),
+      createClick(1, 1, false),
+      createClick(2, 3, false),
+      createClick(1, 2, false),
+      createClick(2, 3, false),
+      createClick(3, 3, false),
+      createClick(4, 3, false),
+      createClick(5, 3, false),
+      createClick(6, 3, false),
+      createClick(7, 3, false),
+      createClick(7, 4, false),
+      createClick(8, 4, false),
+      createClick(12, 3, true),
+      createClick(11, 3, true),
+      createClick(10, 3, true),
+      createClick(9, 3, true),
+      createClick(8, 3, true),
+      createClick(7, 4, true),
+      createClick(7, 4, true),
+      createClick(7, 3, true),
+      createClick(6, 3, true),
+      createClick(5, 3, true),
+      createClick(4, 3, true),
+      createClick(3, 3, true),
+      createClick(7, 4, false),
+      createClick(8, 5, true)
+    ];
+    playLevel(14, clicks);
+  });
 });
