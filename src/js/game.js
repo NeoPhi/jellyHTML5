@@ -170,6 +170,50 @@ var levels = [
     'x x           x x x x x x x ',
     'x x           x x x x x x x ',
     'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x x x x l0l0l0x x x g b   x ',
+    'x x x x l0          b g   x ',
+    'x x x x l0        l1l1x x x ',
+    'x x x x l0l0l0x x x x x x x ',
+    'x   l2l2l2    x x x x x x x ',
+    'x x x x           x x gtx x ',
+    'x x x x       g         btx ',
+    'x x x x       x           x ',
+    'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x                         x ',
+    'x b l0l1                  x ',
+    'x b l0y y           y     x ',
+    'x b l0l2l3          y l4bbx ',
+    'x x x x x   y       x x x x ',
+    'x x x x x   y y     x x x x ',
+    'x x x x x   y y y   x x x x ',
+    'x x x x x   y y y y x x x x ',
+    'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x grl0        grl2glx     x ',
+    'x   l1gl        l2  x     x ',
+    'x l3l3l3        l4  x     x ',
+    'x gt  gt      g gtg       x ',
+    'x x x           x x x     x ',
+    'x x x           x x x     x ',
+    'x x x           x x x     x ',
+    'x x x                     x ',
+    'x x x x x x x x x x x x x x '
+  ], [
+    'x x x x x x x x x x x x x x ',
+    'x r r r r       r g g x x x ',
+    'x x x b         x x x x x x ',
+    'x x x x               x btx ',
+    'x x                       x ',
+    'x x                       x ',
+    'x x           x           x ',
+    'x x   x                   x ',
+    'x x                 x     x ',
+    'x x x x x x x x x x x x x x '
   ]
 ];
 
