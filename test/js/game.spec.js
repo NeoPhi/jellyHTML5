@@ -39,9 +39,6 @@ describe('game.js', function() {
       board.eventListeners[click.method](event);
     });
     expect(status.appendChild.callCount).toBe(2, 'Level ' + (level + 1));
-    if (status.appendChild.callCount === 2) {
-      expect(status.appendChild.argsForCall[1][0].text).toBe('COMPLETE!');
-    }
   }
 
   beforeEach(function() {
@@ -646,5 +643,162 @@ describe('game.js', function() {
       createClick(3, 5, true)
     ];
     playLevel(15, clicks);
+  });
+
+  it('plays level 17', function() {
+    var clicks = [
+      createClick(10, 2, true),
+      createClick(9, 3, true),
+      createClick(9, 2, true),
+      createClick(9, 3, true),
+      createClick(8, 2, true),
+      createClick(7, 3, true),
+      createClick(3, 5, false),
+      createClick(4, 5, false),
+      createClick(7, 7, true),
+      createClick(6, 7, true),
+      createClick(5, 7, true),
+      createClick(7, 3, false),
+      createClick(5, 6, false),
+      createClick(6, 6, false),
+      createClick(7, 2, true),
+      createClick(6, 2, true),
+      createClick(5, 7, false),
+      createClick(11, 2, false),
+      createClick(11, 1, true),
+      createClick(12, 2, true),
+      createClick(10, 2, true),
+      createClick(9, 2, true),
+      createClick(9, 2, true),
+      createClick(7, 2, true),
+      createClick(4, 7, false),
+      createClick(5, 7, false),
+      createClick(7, 2, true),
+      createClick(6, 2, true),
+      createClick(5, 7, false),
+      createClick(6, 7, false),
+      createClick(7, 7, false),
+      createClick(8, 7, false),
+      createClick(9, 7, false),
+      createClick(9, 8, false),
+      createClick(10, 8, false),
+      createClick(10, 8, false)
+    ];
+    playLevel(16, clicks);
+  });
+
+  it('plays level 18', function() {
+    var clicks = [
+      createClick(10, 4, true),
+      createClick(9, 7, true),
+      createClick(3, 2, false),
+      createClick(3, 4, false),
+      createClick(3, 3, false),
+      createClick(4, 2, false),
+      createClick(4, 3, false),
+      createClick(4, 4, false),
+      createClick(5, 2, false),
+      createClick(5, 4, false),
+      createClick(5, 3, false),
+      createClick(6, 2, false),
+      createClick(6, 5, false),
+      createClick(6, 5, false),
+      createClick(6, 4, false),
+      createClick(7, 3, false),
+      createClick(7, 5, false),
+      createClick(6, 8, false),
+      createClick(8, 4, false),
+      createClick(8, 5, false),
+      createClick(8, 3, false),
+      createClick(8, 4, false),
+      createClick(9, 3, false),
+      createClick(10, 3, false),
+      createClick(11, 3, false),
+      createClick(11, 4, true),
+      createClick(10, 4, true),
+      createClick(9, 5, true),
+      createClick(1, 3, false),
+      createClick(2, 3, false),
+      createClick(3, 3, false),
+      createClick(4, 3, false),
+      createClick(5, 3, false),
+      createClick(6, 3, false),
+      createClick(7, 3, false),
+      createClick(8, 3, false),
+      createClick(9, 3, false),
+      createClick(10, 3, false)
+    ];
+    playLevel(17, clicks);
+  });
+
+  it('plays level 19', function() {
+    var clicks = [
+      createClick(2, 2, false),
+      createClick(3, 2, false),
+      createClick(8, 2, true),
+      createClick(8, 3, true),
+      createClick(3, 3, false),
+      createClick(6, 3, true),
+      createClick(7, 3, false),
+      createClick(3, 3, true),
+      createClick(5, 6, false),
+      createClick(8, 3, true),
+      createClick(7, 3, true),
+      createClick(6, 5, true),
+      createClick(2, 2, false),
+      createClick(3, 2, false),
+      createClick(3, 3, false),
+      createClick(4, 3, false),
+      createClick(4, 3, false),
+      createClick(4, 3, false),
+      createClick(5, 3, false),
+      createClick(6, 3, false),
+      createClick(7, 3, false),
+      createClick(8, 4, false),
+      createClick(9, 4, false),
+      createClick(10, 4, false),
+      createClick(11, 4, false),
+      createClick(11, 8, true),
+      createClick(11, 8, true),
+      createClick(10, 8, true),
+      createClick(9, 8, true),
+      createClick(8, 8, true)
+    ];
+    playLevel(18, clicks);
+  });
+
+  it('plays level 20', function() {
+    var clicks = [
+      createClick(3, 1, false),
+      createClick(4, 1, false),
+      createClick(5, 1, false),
+      createClick(7, 5, false),
+      createClick(10, 1, true),
+      createClick(8, 1, true),
+      createClick(8, 1, true),
+      createClick(7, 3, true),
+      createClick(8, 5, true),
+      createClick(3, 2, false),
+      createClick(4, 3, false),
+      createClick(4, 4, false),
+      createClick(5, 3, false),
+      createClick(5, 4, false),
+      createClick(6, 3, false),
+      createClick(6, 4, false),
+      createClick(7, 3, false),
+      createClick(9, 5, false),
+      createClick(10, 7, true),
+      createClick(8, 5, false),
+      createClick(8, 4, false),
+      createClick(9, 5, false),
+      createClick(9, 6, false),
+      createClick(9, 4, false),
+      createClick(10, 5, false),
+      createClick(10, 6, false),
+      createClick(10, 4, false),
+      createClick(11, 5, false),
+      createClick(11, 4, false)
+    ];
+    playLevel(19, clicks);
   });
 });
