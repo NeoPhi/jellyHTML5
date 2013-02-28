@@ -1,5 +1,5 @@
 describe('core', function() {
-  var core = require('../../src/js/core');
+  var core = require('../../src/client/core');
 
   var jelly;
   var wall;

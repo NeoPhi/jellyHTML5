@@ -22,7 +22,8 @@
   // value to determine if they are assignable.
   "globals": {
     "module": false,
-    "require": false
+    "require": false,
+    "process": false
   },
 
   // ************************************************************

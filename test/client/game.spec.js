@@ -1,6 +1,6 @@
 describe('game.js', function() {
-  var game = require('../../src/js/game');
-  var core = require('../../src/js/core');
+  var game = require('../../src/client/game');
+  var core = require('../../src/client/core');
 
   var document;
   var window;

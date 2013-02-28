@@ -1,0 +1,75 @@
+!!! 5
+html
+  head
+    title Jelly no Puzzle Clone
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(href="/css/bootstrap-2.3.0#{cssExt}", rel="stylesheet", media="screen")
+    style(type="text/css")
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+    link(href="/css/bootstrap-responsive-2.3.0#{cssExt}", rel="stylesheet", media="screen")
+  body
+    div.navbar.navbar-inverse.navbar-fixed-top
+      div.navbar-inner
+        div.container-fluid
+          button.btn.btn-navbar(type="button", data-toggle="collapse", data-target=".nav-collapse")
+            span.icon-bar
+            span.icon-bar
+          p.brand Jelly no Puzzle Clone
+          div.nav-collapse.collapse
+            p.navbar-text.pull-right
+              if user
+                | Welcome #{user.email} 
+                a(href="/auth/signout") Sign Out
+                | .
+              else
+                a(href="/auth/signup") Sign Up 
+                | or 
+                a(href="/auth/signin") Sign In
+                | to track progress.
+            ul.nav
+              li
+                a(href="https://github.com/NeoPhi/jellyHTML5") About
+              li
+                a(href="https://github.com/NeoPhi/jellyHTML5/issues") Contact
+
+    div.container-fluid
+      div.row-fluid
+        div.span9
+          div.hero-unit
+            canvas#board(width="560", height="400")
+              p Your browser doesn't support canvas.
+
+        div.span3
+          div.well.sidebar-nav
+            div#status
+            br
+            select#levels
+            br
+            button#reset.btn.btn-primary Reset
+
+      div.row-fluid
+        div.span12
+          ul
+            li.
+              HTML5 port (Google Chrome only at this time) of the Windows only <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The original is much better, play it if you can.
+            li.
+              Goal: Merge all jellies of the same color
+            li.
+              Controls: Left and right mouse clicks move jellies
+            li.
+              Note: Purple jellies don't merge, they are just there to help
+            li.
+              Note: Some jellies are fixed and can't move
+
+    hr
+    footer
+      | Brought to by 
+      a(href="http://danielr.neophi.com/") Daniel Rinehart 
+      | under an MIT License.
+
+    script(src="/js/jquery-1.9.1#{jsExt}")
+    script(src="/js/bootstrap-2.3.0#{jsExt}")
+    script(src="/js/jelly.js")

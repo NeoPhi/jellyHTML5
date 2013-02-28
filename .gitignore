@@ -1,18 +1,7 @@
-lib-cov
-*.seed
-*.log
-*.csv
-*.dat
-*.out
-*.pid
-*.gz
+/node_modules
+/coverage
+/build
 
-pids
-logs
-results
+/npm-debug.log
 
-/src/html/bundle.js
-
-node_modules
-coverage
-npm-debug.log
+/config.sh
