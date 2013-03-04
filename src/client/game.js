@@ -1,222 +1,4 @@
 var core = require('./core');
-var debug = require('debug')('game');
-
-var levels = [
-  [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x                         x ',
-    'x             r           x ',
-    'x             x x         x ',
-    'x     g           r   b   x ',
-    'x x b x x x g   x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x                         x ',
-    'x                         x ',
-    'x           g       g     x ',
-    'x       r   r       r     x ',
-    'x x x x x   x   x   x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x                         x ',
-    'x       b g     x   g     x ',
-    'x x x   x x x r x x x     x ',
-    'x             b           x ',
-    'x x x   x x x r x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x               r         x ',
-    'x               b         x ',
-    'x               x         x ',
-    'x   b   r                 x ',
-    'x   b   r             b   x ',
-    'x x x   x             x x x ',
-    'x x x x x   x x x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x                         x ',
-    'x r g     g g             x ',
-    'x x x   x x x x   x x     x ',
-    'x r g                     x ',
-    'x x x x x     x x       x x ',
-    'x x x x x x   x x     x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x             x ',
-    'x x x x x x x   g         x ',
-    'x               x x       x ',
-    'x   r       b             x ',
-    'x   x   x x x   x   g     x ',
-    'x                   x   b x ',
-    'x               r   x x x x ',
-    'x       x x x x x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x                     r   x ',
-    'x                     x   x ',
-    'x           b       b     x ',
-    'x           x     r r     x ',
-    'x                   x     x ',
-    'x   rb    bbx   x   x     x ',
-    'x   x     x x   x   x     x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x x x   x     x   x x x x ',
-    'x x x     g     b     x x x ',
-    'x x       x     x       x x ',
-    'x x       bt    gt      x x ',
-    'x x g                 b x x ',
-    'x x x g             b x x x ',
-    'x x x x             x x x x ',
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x                         x ',
-    'x                         x ',
-    'x                         x ',
-    'x                     r b x ',
-    'x         x           x x x ',
-    'x b                 l l x x ',
-    'x x     rbx     x   x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x       g r               x ',
-    'x       l0l0  l1          x ',
-    'x         x   x   x x x x x ',
-    'x                         x ',
-    'x     x     x             x ',
-    'x                 x     rbx ',
-    'x x       x           gbx x ',
-    'x                     x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x             yrl0l0yl  y x ',
-    'x               x x x   x x ',
-    'x                       y x ',
-    'x l1l1                  x x ',
-    'x x x                     x ',
-    'x               y         x ',
-    'x       x   x x x       ybx ',
-    'x       x x x x x x   x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x r   r r     r r   r x x ',
-    'x x x     x     x     x x x ',
-    'x                         x ',
-    'x b                     bbx ',
-    'x x                     x x ',
-    'x                         x ',
-    'x                         x ',
-    'x       x x x x x x       x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x x x x x x x x ',
-    'x x x x x   y r   x x x x x ',
-    'x x x x x   r b   x x x x x ',
-    'x x x x x   y r   x x x x x ',
-    'x x x x x   b y   x x x x x ',
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x x x x x x x x       r x ',
-    'x x x x x x x x x       g x ',
-    'x x x x x x x x x       g x ',
-    'x l0l0l1l1              g x ',
-    'x l0l0l1l1              g x ',
-    'x l2l2l3l3            x x x ',
-    'x l2l2l3l3            x x x ',
-    'x x rb  x   gbx x x   x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x r   r   r             r x ',
-    'x g   x   x             g x ',
-    'x bb                    b x ',
-    'x x x x x           x x x x ',
-    'x x x x x x       x x x x x ',
-    'x x x x x x       x x x x x ',
-    'x x x x x x       x x x x x ',
-    'x x x x x x glg grx x x x x ',
-    'x x x x x x       x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x       l0l0l0l1l2l3l3r x ',
-    'x x       l0l4l1l1l2l3l3x x ',
-    'x x       l4l4l4l1l2l2x x x ',
-    'x x           x x x x x x x ',
-    'x rt          x x x x x x x ',
-    'x x           x x x x x x x ',
-    'x x           x x x x x x x ',
-    'x x           x x x x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x x x x l0l0l0x x x g b   x ',
-    'x x x x l0          b g   x ',
-    'x x x x l0        l1l1x x x ',
-    'x x x x l0l0l0x x x x x x x ',
-    'x   l2l2l2    x x x x x x x ',
-    'x x x x           x x gtx x ',
-    'x x x x       g         btx ',
-    'x x x x       x           x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x                         x ',
-    'x b l0l1                  x ',
-    'x b l0y y           y     x ',
-    'x b l0l2l3          y l4bbx ',
-    'x x x x x   y       x x x x ',
-    'x x x x x   y y     x x x x ',
-    'x x x x x   y y y   x x x x ',
-    'x x x x x   y y y y x x x x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x grl0        grl2glx     x ',
-    'x   l1gl        l2  x     x ',
-    'x l3l3l3        l4  x     x ',
-    'x gt  gt      g gtg       x ',
-    'x x x           x x x     x ',
-    'x x x           x x x     x ',
-    'x x x           x x x     x ',
-    'x x x                     x ',
-    'x x x x x x x x x x x x x x '
-  ], [
-    'x x x x x x x x x x x x x x ',
-    'x r r r r       r g g x x x ',
-    'x x x b         x x x x x x ',
-    'x x x x               x btx ',
-    'x x                       x ',
-    'x x                       x ',
-    'x x           x           x ',
-    'x x   x                   x ',
-    'x x                 x     x ',
-    'x x x x x x x x x x x x x x '
-  ]
-];
 
 // https://developer.mozilla.org/en-US/docs/HTML/Canvas/Tutorial/Drawing_shapes
 
@@ -368,7 +150,9 @@ function isComplete(document, gameBoard) {
   }
 }
 
-function slideObject(document, gameBoard, container, event, left, context) {
+function slideObject(document, state, container, event, left) {
+  var gameBoard = state.gameBoard;
+  var context = state.context;
   event.preventDefault();
 
   var x = Math.floor((event.pageX - container.offsetLeft) / 40);
@@ -444,14 +228,12 @@ function constructRow(row, y, gameBoard, objects, attachments) {
   }
 }
 
-function construct(document, context) {
-  var selector = document.getElementById('levels');
-  var level = levels[selector.value || 0];
+function construct(document, context, level) {
   // TODO Level parsing should be part of core
   var gameBoard = core.createGameBoard();
   var objects = {};
   var attachments = [];
-  level.forEach(function(row, y) {
+  level.layout.forEach(function(row, y) {
     constructRow(row, y, gameBoard, objects, attachments);
   });
   attachments.forEach(function(attachment) {
@@ -466,42 +248,56 @@ function construct(document, context) {
   return gameBoard;
 }
 
+function loadLevel(window, id, state) {
+  window.$.ajax({
+    url: '/levels/' + id,
+    success: function(data) {
+      window.location.hash = '#' + id;
+      state.gameBoard = construct(window.document, state.context, data);
+    }
+  });
+}
+
+function loadLevels(window, state) {
+  window.$.ajax({
+    url: '/levels/',
+    success: function(data) {
+      window.$('#levels').html(function() {
+        var levels = data.map(function(level) {
+          return '<li><button class="btn" data-level="' + level.id + '">' + level.name + '</button></li>';
+        });
+        return levels.join('');
+      }).on('click', function(event) {
+        loadLevel(window, window.$(event.target).data('level'), state);
+      });
+      if (window.location.hash) {
+        loadLevel(window, window.location.hash.substring(1), state);
+      }
+    }
+  });
+}
+
 function doIt(window) {
   var document = window.document;
   var drawingCanvas = document.getElementById('board');
   if (drawingCanvas.getContext) {
     var context = drawingCanvas.getContext('2d');
-    var initialLevel = 0;
-    if (window.location.hash) {
-      initialLevel = parseInt(window.location.hash.substring(1), 10);
-    }
+    var state = {
+      context: context
+    };
+    loadLevels(window, state);
 
-    var selector = document.getElementById('levels');
-    levels.forEach(function(level, i) {
-      var option = document.createElement('option');
-      if (i === initialLevel) {
-        option.selected = true;
-      }
-      option.value = i;
-      option.text = 'Level ' + (i + 1);
-      selector.appendChild(option);
-    });
-    selector.addEventListener('change', function() {
-      window.location.hash = '#' + selector.value;
-      gameBoard = construct(document, context);
-    });
-
-    var gameBoard = construct(document, context);
-    drawGameBoard(gameBoard, context);
     window.$('#board').on('click', function(event) {
-      slideObject(document, gameBoard, this, event, true, context);
+      slideObject(document, state, this, event, true);
     }).on('contextmenu', function(event) {
-      slideObject(document, gameBoard, this, event, false, context);
+      slideObject(document, state, this, event, false);
     });
 
+    /*
     document.getElementById('reset').addEventListener('click', function() {
       gameBoard = construct(document, context);
     });
+    */
   } else {
     setStatus(document, 'Unable to get drawing context');
   }

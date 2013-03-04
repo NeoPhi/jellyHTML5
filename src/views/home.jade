@@ -9,6 +9,10 @@ html
         padding-top: 60px;
         padding-bottom: 40px;
       }
+      .scroll {
+        height: 400px;
+        overflow: auto;
+      }
     link(href="/css/bootstrap-responsive-2.3.0#{cssExt}", rel="stylesheet", media="screen")
   body
     div.navbar.navbar-inverse.navbar-fixed-top
@@ -41,20 +45,22 @@ html
           div.hero-unit
             canvas#board(width="560", height="400")
               p Your browser doesn't support canvas.
+            br
+            div.btn-group
+              // button#reset.btn.btn-primary Reset  
 
         div.span3
           div.well.sidebar-nav
             div#status
             br
-            select#levels
-            br
-            button#reset.btn.btn-primary Reset
+            div.scroll
+              ul#levels
 
       div.row-fluid
         div.span12
           ul
             li.
-              HTML5 clone of <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The Windows only original is much better, play it if you can.
+              HTML5 clone of <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The original Windows version is much better, play it if you can.
             li.
               Goal: Merge all jellies of the same color.
             li.
@@ -73,3 +79,18 @@ html
     script(src="/js/jquery-1.9.1#{jsExt}")
     script(src="/js/bootstrap-2.3.0#{jsExt}")
     script(src="/js/jelly.js")
+
+    <!-- dailycred -->
+    script(type="text/javascript")
+      (function() {
+        var dc, url;
+        window.dc_opts = {
+          clientId: "874fadc7-5ba2-470a-a9d8-ca243fe08575",
+          home: "https://www.dailycred.com"
+        };
+        dc = document.createElement("script");
+        url = dc_opts.home + "/public/js/cred.coffee";
+        dc.src = url;
+        document.body.appendChild(dc);
+      }).call(this);
+    <!-- end dailycred -->

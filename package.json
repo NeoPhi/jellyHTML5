@@ -9,7 +9,8 @@
     "passport-dailycred": "0.2.0",
     "mongoose": "3.5.7",
     "connect-redis": "1.4.5",
-    "debug": "0.7.2"
+    "debug": "0.7.2",
+    "async": "0.2.6"
   },
   "devDependencies": {
     "jshint": "0.9.1",
@@ -18,7 +19,7 @@
     "browserify": "1.18.0"
   },
   "scripts": {
-    "pretest": "jshint --config jshint/src.json src/client src/server && jshint --config jshint/test.json test",
+    "pretest": "jshint --config jshint/src.json src/client src/server tools && jshint --config jshint/test.json test",
     "test": "istanbul test jasmine-node -- test",
     "posttest": "browserify src/wrapper/wrapper.js -o build/js/jelly.js",
     "start": "node src/server/server.js"

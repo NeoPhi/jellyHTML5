@@ -8,6 +8,7 @@ describe('game.js', function() {
   var board;
   var context;
   var levels;
+  var level;
   var reset;
   var status;
   var gameBoard;
@@ -25,10 +26,8 @@ describe('game.js', function() {
     };
   }
 
-  function playLevel(level, clicks) {
+  function playLevel(clicks) {
     spyOn(status, 'appendChild').andCallThrough();
-    levels.value = level;
-
     game.doIt(window);
 
     clicks.forEach(function(click) {
@@ -43,7 +42,7 @@ describe('game.js', function() {
       };
       board.eventListeners[click.method].call(that, event);
     });
-    expect(status.appendChild.callCount).toBe(2, 'Level ' + (level + 1));
+    expect(status.appendChild.callCount).toBe(2);
   }
 
   beforeEach(function() {
@@ -82,8 +81,27 @@ describe('game.js', function() {
     };
 
     levels = {
-      appendChild: function() {},
-      addEventListener: function() {}
+      html: function() {
+        return levels;
+      },
+      on: function() {
+        return levels;
+      }
+    };
+
+    level = {
+      layout: [
+        'x x x x x x x x x x x x x x ',
+        'x grl0        grl2glx     x ',
+        'x   l1gl        l2  x     x ',
+        'x l3l3l3        l4  x     x ',
+        'x gt  gt      g gtg       x ',
+        'x x x           x x x     x ',
+        'x x x           x x x     x ',
+        'x x x           x x x     x ',
+        'x x x                     x ',
+        'x x x x x x x x x x x x x x '
+      ]
     };
 
     reset = {
@@ -115,638 +133,34 @@ describe('game.js', function() {
       }
     };
 
-    $ = function() {
-      return board;
+    $ = function(name) {
+      return {
+        '#board': board,
+        '#levels': levels
+      }[name];
+    };
+    $.ajax = function(options) {
+      if (options.url === '/levels/') {
+        return options.success([]);
+      }
+      options.success(level);
     };
 
     window = {
       document: document,
-      location: {},
+      location: {
+        hash: '12345'
+      },
       $: $
     };
   });
 
-  it('creates initial level', function() {
+  it('creates level', function() {
     game.doIt(window);
-    expect(gameBoard.addObject.callCount).toBe(57);
+    expect(gameBoard.addObject.callCount).toBe(81);
   });
 
-  it('creates complex level', function() {
-    levels.value = 6;
-    game.doIt(window);
-    expect(gameBoard.addObject.callCount).toBe(62);
-  });
-
-  it('plays level 1', function() {
-    var clicks = [
-      createClick(6, 6, false),
-      createClick(3, 5, false),
-      createClick(4, 5, false),
-      createClick(5, 5, false),
-      createClick(11, 5, true),
-      createClick(10, 5, true),
-      createClick(9, 5, true),
-      createClick(8, 5, true),
-      createClick(7, 3, true),
-      createClick(7, 5, true),
-      createClick(6, 5, true),
-      createClick(5, 5, true),
-      createClick(4, 5, true),
-      createClick(3, 5, true)
-    ];
-    playLevel(0, clicks);
-  });
-
-  it('plays level 2', function() {
-    var clicks = [
-      createClick(6, 4, true),
-      createClick(4, 5, false),
-      createClick(5, 5, false),
-      createClick(6, 5, false),
-      createClick(7, 5, false),
-      createClick(10, 4, true),
-      createClick(9, 4, true),
-      createClick(10, 5, true),
-      createClick(9, 5, true),
-      createClick(8, 4, true),
-      createClick(7, 4, true),
-      createClick(6, 4, true)
-    ];
-    playLevel(1, clicks);
-  });
-
-  it('plays level 3', function() {
-    var clicks = [
-      createClick(5, 3, true),
-      createClick(4, 3, true),
-      createClick(3, 5, false),
-      createClick(4, 5, false),
-      createClick(5, 5, false),
-      createClick(6, 5, false),
-      createClick(8, 5, false),
-      createClick(9, 5, false),
-      createClick(10, 5, false),
-      createClick(11, 5, false),
-      createClick(10, 3, false),
-      createClick(12, 5, true),
-      createClick(11, 5, true),
-      createClick(10, 5, true),
-      createClick(9, 5, true),
-      createClick(8, 5, true),
-      createClick(7, 5, true),
-      createClick(6, 5, true),
-      createClick(5, 5, true),
-      createClick(4, 5, true)
-    ];
-    playLevel(2, clicks);
-  });
-
-  it('plays level 4', function() {
-    var clicks = [
-      createClick(11, 6, true),
-      createClick(10, 7, true),
-      createClick(9, 7, true),
-      createClick(8, 3, true),
-      createClick(8, 7, true),
-      createClick(7, 7, true),
-      createClick(4, 6, false),
-      createClick(5, 6, false),
-      createClick(6, 7, false),
-      createClick(6, 6, false),
-      createClick(7, 7, false),
-      createClick(7, 6, false),
-      createClick(8, 7, false),
-      createClick(8, 6, false),
-      createClick(9, 7, false),
-      createClick(9, 6, false),
-      createClick(10, 6, false),
-      createClick(9, 7, true),
-      createClick(8, 7, true),
-      createClick(8, 3, true),
-      createClick(7, 7, true),
-      createClick(7, 6, true),
-      createClick(6, 7, true),
-      createClick(6, 6, true),
-      createClick(5, 6, true),
-      createClick(4, 6, true),
-      createClick(6, 7, false),
-      createClick(7, 7, false),
-      createClick(8, 7, false),
-      createClick(9, 7, false),
-      createClick(11, 6, true),
-      createClick(10, 6, true),
-      createClick(9, 7, true),
-      createClick(9, 6, true),
-      createClick(8, 7, true),
-      createClick(8, 6, true),
-      createClick(7, 7, true),
-      createClick(2, 5, false),
-      createClick(3, 5, false),
-      createClick(4, 5, false),
-      createClick(7, 6, true),
-      createClick(6, 6, true),
-      createClick(5, 6, true),
-      createClick(4, 6, true)
-    ];
-    playLevel(3, clicks);
-  });
-
-  it('plays level 5', function() {
-    var clicks = [
-      createClick(2, 5, false),
-      createClick(3, 5, false),
-      createClick(1, 3, false),
-      createClick(3, 5, false),
-      createClick(2, 3, false),
-      createClick(3, 5, false),
-      createClick(4, 5, false),
-      createClick(5, 5, false),
-      createClick(6, 5, false),
-      createClick(7, 5, false),
-      createClick(8, 5, false),
-      createClick(1, 5, false),
-      createClick(2, 5, false),
-      createClick(3, 5, false),
-      createClick(4, 5, false),
-      createClick(5, 5, false),
-      createClick(6, 5, false),
-      createClick(7, 5, false),
-      createClick(8, 5, false),
-      createClick(9, 6, false),
-      createClick(5, 3, false),
-      createClick(6, 3, false),
-      createClick(7, 3, false),
-      createClick(8, 3, false),
-      createClick(9, 3, false),
-      createClick(10, 3, false),
-      createClick(11, 5, true),
-      createClick(10, 5, true),
-      createClick(9, 5, true),
-      createClick(8, 5, true),
-      createClick(7, 5, true)
-    ];
-    playLevel(4, clicks);
-  });
-
-  it('plays level 6', function() {
-    var clicks = [
-      createClick(8, 7, false),
-      createClick(10, 5, true),
-      createClick(9, 6, true),
-      createClick(9, 7, true),
-      createClick(8, 7, true),
-      createClick(7, 7, true),
-      createClick(6, 7, true),
-      createClick(5, 7, true),
-      createClick(4, 7, true),
-      createClick(2, 4, false),
-      createClick(3, 6, false),
-      createClick(4, 6, false),
-      createClick(5, 6, false),
-      createClick(6, 6, false),
-      createClick(8, 2, true),
-      createClick(6, 4, false),
-      createClick(7, 4, false),
-      createClick(7, 6, false),
-      createClick(8, 6, false),
-      createClick(8, 4, false),
-      createClick(9, 5, false),
-      createClick(10, 5, false),
-      createClick(7, 7, true),
-      createClick(6, 7, true),
-      createClick(5, 7, true),
-      createClick(4, 7, true)
-    ];
-    playLevel(5, clicks);
-  });
-
-  it('plays level 7', function() {
-    var clicks = [
-      createClick(10, 5, true),
-      createClick(10, 5, true),
-      createClick(9, 5, true),
-      createClick(9, 6, true),
-      createClick(6, 4, false),
-      createClick(7, 5, false),
-      createClick(8, 5, false),
-      createClick(8, 6, true),
-      createClick(11, 2, true),
-      createClick(10, 4, true),
-      createClick(9, 4, true),
-      createClick(8, 6, true),
-      createClick(10, 5, true),
-      createClick(9, 6, true),
-      createClick(8, 6, true),
-      createClick(7, 6, true)
-    ];
-    playLevel(6, clicks);
-  });
-
-  it('plays level 8', function() {
-    var clicks = [
-      createClick(3, 6, false),
-      createClick(4, 7, false),
-      createClick(5, 7, false),
-      createClick(6, 7, false),
-      createClick(7, 7, false),
-      createClick(8, 7, false),
-      createClick(10, 6, true),
-      createClick(11, 5, true),
-      createClick(10, 6, true),
-      createClick(9, 7, true),
-      createClick(9, 6, true),
-      createClick(8, 7, true),
-      createClick(8, 6, true),
-      createClick(7, 7, true),
-      createClick(7, 6, true),
-      createClick(6, 7, true),
-      createClick(6, 6, true),
-      createClick(5, 7, true),
-      createClick(5, 6, true),
-      createClick(2, 5, false),
-      createClick(3, 5, false),
-      createClick(3, 6, false),
-      createClick(4, 5, false),
-      createClick(4, 7, false),
-      createClick(4, 6, false),
-      createClick(5, 5, false),
-      createClick(5, 7, false),
-      createClick(5, 6, false),
-      createClick(6, 5, false),
-      createClick(6, 7, false),
-      createClick(6, 6, false),
-      createClick(7, 5, false),
-      createClick(8, 2, true),
-      createClick(7, 6, true),
-      createClick(7, 7, true),
-      createClick(6, 6, true),
-      createClick(6, 7, false),
-      createClick(5, 2, false),
-      createClick(6, 5, false),
-      createClick(7, 6, false)
-    ];
-    playLevel(7, clicks);
-  });
-
-  it('plays level 9', function() {
-    var clicks = [
-      createClick(11, 7, true),
-      createClick(12, 5, true),
-      createClick(11, 5, true),
-      createClick(10, 5, true),
-      createClick(9, 6, true),
-      createClick(8, 7, true),
-      createClick(10, 6, true),
-      createClick(9, 7, true),
-      createClick(9, 6, true),
-      createClick(8, 7, true),
-      createClick(8, 6, true),
-      createClick(7, 7, true),
-      createClick(6, 7, true),
-      createClick(6, 7, true),
-      createClick(5, 7, true),
-      createClick(4, 7, true),
-      createClick(1, 7, false),
-      createClick(2, 7, false),
-      createClick(3, 7, false),
-      createClick(4, 7, false),
-      createClick(5, 7, false),
-      createClick(7, 7, true),
-      createClick(6, 7, true),
-      createClick(5, 7, true)
-    ];
-    playLevel(8, clicks);
-  });
-
-  it('plays level 10', function() {
-    var clicks = [
-      createClick(7, 2, true),
-      createClick(6, 4, true),
-      createClick(5, 2, true),
-      createClick(4, 4, false),
-      createClick(4, 4, false),
-      createClick(5, 4, false),
-      createClick(5, 6, false),
-      createClick(6, 8, false),
-      createClick(6, 4, false),
-      createClick(5, 6, false),
-      createClick(6, 6, false),
-      createClick(7, 6, false),
-      createClick(5, 2, false),
-      createClick(6, 4, false),
-      createClick(7, 5, false),
-      createClick(8, 5, false),
-      createClick(8, 6, true),
-      createClick(7, 6, true),
-      createClick(6, 6, true),
-      createClick(5, 6, true),
-      createClick(3, 8, false),
-      createClick(4, 8, false),
-      createClick(5, 8, false),
-      createClick(6, 8, false),
-      createClick(7, 7, false),
-      createClick(8, 7, false),
-      createClick(7, 8, false),
-      createClick(9, 7, false),
-      createClick(9, 5, false),
-      createClick(10, 6, false)
-    ];
-    playLevel(9, clicks);
-  });
-
-  it('plays level 11', function() {
-    var clicks = [
-      createClick(8, 6, true),
-      createClick(7, 6, true),
-      createClick(9, 1, true),
-      createClick(8, 1, true),
-      createClick(7, 1, true),
-      createClick(2, 4, false),
-      createClick(3, 4, false),
-      createClick(4, 4, false),
-      createClick(5, 4, false),
-      createClick(6, 4, false),
-      createClick(7, 4, false),
-      createClick(6, 5, false),
-      createClick(7, 5, false),
-      createClick(8, 5, false),
-      createClick(8, 4, false),
-      createClick(9, 4, false),
-      createClick(10, 4, false),
-      createClick(12, 1, true),
-      createClick(10, 4, true),
-      createClick(9, 4, true),
-      createClick(9, 5, true),
-      createClick(11, 3, true),
-      createClick(7, 5, false),
-      createClick(8, 5, false),
-      createClick(9, 5, false)
-    ];
-    playLevel(10, clicks);
-  });
-
-  it('plays level 12', function() {
-    var clicks = [
-      createClick(11, 1, true),
-      createClick(9, 1, true),
-      createClick(7, 1, true),
-      createClick(6, 7, true),
-      createClick(6, 7, true),
-      createClick(5, 7, true),
-      createClick(2, 1, false),
-      createClick(4, 7, false),
-      createClick(4, 1, true),
-      createClick(4, 5, true),
-      createClick(1, 4, false),
-      createClick(2, 4, false),
-      createClick(3, 5, false),
-      createClick(3, 4, false),
-      createClick(4, 5, false),
-      createClick(4, 4, false),
-      createClick(5, 5, false),
-      createClick(5, 4, false),
-      createClick(6, 5, false),
-      createClick(6, 4, false),
-      createClick(7, 5, false),
-      createClick(7, 4, false),
-      createClick(8, 5, false),
-      createClick(8, 4, false),
-      createClick(9, 5, false),
-      createClick(9, 4, false),
-      createClick(10, 5, false),
-      createClick(10, 4, false)
-    ];
-    playLevel(11, clicks);
-  });
-
-  it('plays level 13', function() {
-    var clicks = [
-      createClick(7, 3, false),
-      createClick(6, 6, true),
-      createClick(7, 5, false),
-      createClick(7, 4, true),
-      createClick(6, 4, true)
-    ];
-    playLevel(12, clicks);
-  });
-
-  it('plays level 14', function() {
-    var clicks = [
-      createClick(4, 6, false),
-      createClick(4, 4, false),
-      createClick(5, 6, false),
-      createClick(5, 4, false),
-      createClick(6, 7, false),
-      createClick(6, 4, false),
-      createClick(7, 6, false),
-      createClick(7, 4, false),
-      createClick(8, 6, false),
-      createClick(8, 4, false),
-      createClick(9, 6, false),
-      createClick(9, 5, false),
-      createClick(10, 4, false),
-      createClick(12, 1, true),
-      createClick(11, 3, true),
-      createClick(10, 3, true),
-      createClick(9, 6, true),
-      createClick(9, 5, true),
-      createClick(8, 6, true),
-      createClick(8, 5, true),
-      createClick(7, 6, true),
-      createClick(7, 5, true),
-      createClick(6, 6, true),
-      createClick(6, 5, true),
-      createClick(5, 6, true),
-      createClick(5, 5, true),
-      createClick(4, 5, true),
-      createClick(5, 7, false),
-      createClick(6, 6, false),
-      createClick(7, 6, false),
-      createClick(8, 6, false),
-      createClick(8, 6, false),
-      createClick(10, 5, true),
-      createClick(10, 5, true),
-      createClick(9, 6, true),
-      createClick(9, 4, true),
-      createClick(8, 6, true),
-      createClick(8, 5, true),
-      createClick(7, 6, true),
-      createClick(7, 5, true),
-      createClick(6, 6, true),
-      createClick(6, 5, true),
-      createClick(5, 6, true),
-      createClick(5, 5, true),
-      createClick(2, 7, false),
-      createClick(5, 6, false),
-      createClick(6, 6, false),
-      createClick(7, 6, false),
-      createClick(8, 6, false),
-      createClick(9, 6, false),
-      createClick(12, 4, true),
-      createClick(11, 4, true),
-      createClick(10, 4, true),
-      createClick(9, 7, true),
-      createClick(9, 7, true),
-      createClick(9, 7, true),
-      createClick(8, 7, true),
-      createClick(7, 7, true)
-    ];
-    playLevel(13, clicks);
-  });
-
-  it('plays level 15', function() {
-    var clicks = [
-      createClick(12, 2, true),
-      createClick(11, 3, true),
-      createClick(12, 2, true),
-      createClick(11, 3, true),
-      createClick(9, 4, true),
-      createClick(10, 3, true),
-      createClick(9, 4, true),
-      createClick(5, 1, true),
-      createClick(3, 1, true),
-      createClick(2, 3, false),
-      createClick(1, 1, false),
-      createClick(2, 3, false),
-      createClick(1, 2, false),
-      createClick(2, 3, false),
-      createClick(3, 3, false),
-      createClick(4, 3, false),
-      createClick(5, 3, false),
-      createClick(6, 3, false),
-      createClick(7, 3, false),
-      createClick(7, 4, false),
-      createClick(8, 4, false),
-      createClick(12, 3, true),
-      createClick(11, 3, true),
-      createClick(10, 3, true),
-      createClick(9, 3, true),
-      createClick(8, 3, true),
-      createClick(7, 4, true),
-      createClick(7, 4, true),
-      createClick(7, 3, true),
-      createClick(6, 3, true),
-      createClick(5, 3, true),
-      createClick(4, 3, true),
-      createClick(3, 3, true),
-      createClick(7, 4, false),
-      createClick(8, 5, true)
-    ];
-    playLevel(14, clicks);
-  });
-
-  it('plays level 16', function() {
-    var clicks = [
-      createClick(7, 3, true),
-      createClick(8, 2, true),
-      createClick(7, 2, true),
-      createClick(6, 4, true),
-      createClick(5, 4, true),
-      createClick(6, 8, true),
-      createClick(5, 8, true),
-      createClick(12, 1, true),
-      createClick(11, 2, true),
-      createClick(10, 3, true),
-      createClick(9, 3, true),
-      createClick(8, 3, true),
-      createClick(4, 4, false),
-      createClick(5, 4, false),
-      createClick(7, 3, true),
-      createClick(6, 3, true),
-      createClick(5, 4, true),
-      createClick(4, 5, true),
-      createClick(3, 5, true)
-    ];
-    playLevel(15, clicks);
-  });
-
-  it('plays level 17', function() {
-    var clicks = [
-      createClick(10, 2, true),
-      createClick(9, 3, true),
-      createClick(9, 2, true),
-      createClick(9, 3, true),
-      createClick(8, 2, true),
-      createClick(7, 3, true),
-      createClick(3, 5, false),
-      createClick(4, 5, false),
-      createClick(7, 7, true),
-      createClick(6, 7, true),
-      createClick(5, 7, true),
-      createClick(7, 3, false),
-      createClick(5, 6, false),
-      createClick(6, 6, false),
-      createClick(7, 2, true),
-      createClick(6, 2, true),
-      createClick(5, 7, false),
-      createClick(11, 2, false),
-      createClick(11, 1, true),
-      createClick(12, 2, true),
-      createClick(10, 2, true),
-      createClick(9, 2, true),
-      createClick(9, 2, true),
-      createClick(7, 2, true),
-      createClick(4, 7, false),
-      createClick(5, 7, false),
-      createClick(7, 2, true),
-      createClick(6, 2, true),
-      createClick(5, 7, false),
-      createClick(6, 7, false),
-      createClick(7, 7, false),
-      createClick(8, 7, false),
-      createClick(9, 7, false),
-      createClick(9, 8, false),
-      createClick(10, 8, false),
-      createClick(10, 8, false)
-    ];
-    playLevel(16, clicks);
-  });
-
-  it('plays level 18', function() {
-    var clicks = [
-      createClick(10, 4, true),
-      createClick(9, 7, true),
-      createClick(3, 2, false),
-      createClick(3, 4, false),
-      createClick(3, 3, false),
-      createClick(4, 2, false),
-      createClick(4, 3, false),
-      createClick(4, 4, false),
-      createClick(5, 2, false),
-      createClick(5, 4, false),
-      createClick(5, 3, false),
-      createClick(6, 2, false),
-      createClick(6, 5, false),
-      createClick(6, 5, false),
-      createClick(6, 4, false),
-      createClick(7, 3, false),
-      createClick(7, 5, false),
-      createClick(6, 8, false),
-      createClick(8, 4, false),
-      createClick(8, 5, false),
-      createClick(8, 3, false),
-      createClick(8, 4, false),
-      createClick(9, 3, false),
-      createClick(10, 3, false),
-      createClick(11, 3, false),
-      createClick(11, 4, true),
-      createClick(10, 4, true),
-      createClick(9, 5, true),
-      createClick(1, 3, false),
-      createClick(2, 3, false),
-      createClick(3, 3, false),
-      createClick(4, 3, false),
-      createClick(5, 3, false),
-      createClick(6, 3, false),
-      createClick(7, 3, false),
-      createClick(8, 3, false),
-      createClick(9, 3, false),
-      createClick(10, 3, false)
-    ];
-    playLevel(17, clicks);
-  });
-
-  it('plays level 19', function() {
+  it('plays level', function() {
     var clicks = [
       createClick(2, 2, false),
       createClick(3, 2, false),
@@ -779,41 +193,6 @@ describe('game.js', function() {
       createClick(9, 8, true),
       createClick(8, 8, true)
     ];
-    playLevel(18, clicks);
-  });
-
-  it('plays level 20', function() {
-    var clicks = [
-      createClick(3, 1, false),
-      createClick(4, 1, false),
-      createClick(5, 1, false),
-      createClick(7, 5, false),
-      createClick(10, 1, true),
-      createClick(8, 1, true),
-      createClick(8, 1, true),
-      createClick(7, 3, true),
-      createClick(8, 5, true),
-      createClick(3, 2, false),
-      createClick(4, 3, false),
-      createClick(4, 4, false),
-      createClick(5, 3, false),
-      createClick(5, 4, false),
-      createClick(6, 3, false),
-      createClick(6, 4, false),
-      createClick(7, 3, false),
-      createClick(9, 5, false),
-      createClick(10, 7, true),
-      createClick(8, 5, false),
-      createClick(8, 4, false),
-      createClick(9, 5, false),
-      createClick(9, 6, false),
-      createClick(9, 4, false),
-      createClick(10, 5, false),
-      createClick(10, 6, false),
-      createClick(10, 4, false),
-      createClick(11, 5, false),
-      createClick(11, 4, false)
-    ];
-    playLevel(19, clicks);
+    playLevel(clicks);
   });
 });

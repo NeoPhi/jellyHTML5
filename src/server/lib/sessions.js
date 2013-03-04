@@ -39,7 +39,7 @@ passport.deserializeUser(function(user, done) {
   done(undefined, user);
 });
 
-function addUsage(app) {
+function addMiddleware(app) {
   app.use(express.session({
     secret: process.env.SESSION_SECRET,
     key: 'sid',
@@ -68,5 +68,5 @@ function addRoutes(app) {
   });
 }
 
-module.exports.addUsage = addUsage;
+module.exports.addMiddleware = addMiddleware;
 module.exports.addRoutes = addRoutes;

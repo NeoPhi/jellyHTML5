@@ -4,11 +4,12 @@ var UserModel;
 var UserSchema = mongoose.Schema({
   dailyCredId: {
     type: String,
-    required: true,
-    index: true
+    unique: true,
+    sparse: true
   },
   email: {
-    type: String
+    type: String,
+    required: true
   },
   picture: {
     type: String
