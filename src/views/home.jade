@@ -29,10 +29,10 @@ html
                 a(href="/auth/signout") Sign Out
                 | .
               else
-                a(href="/auth/signup") Sign Up 
-                | or 
-                a(href="/auth/signin") Sign In 
-                | to track progress.
+                a(href="/auth/signup") Sign Up
+                |  or 
+                a(href="/auth/signin") Sign In
+                |  to track progress.
             ul.nav
               li
                 a(href="https://github.com/NeoPhi/jellyHTML5") About
@@ -60,7 +60,7 @@ html
         div.span12
           ul
             li.
-              HTML5 clone of <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The original Windows version is much better, play it if you can.
+              Clone of <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The original Windows version is much better, play it if you can.
             li.
               Goal: Merge all jellies of the same color.
             li.
@@ -73,8 +73,8 @@ html
     hr
     footer
       | Brought to by 
-      a(href="http://danielr.neophi.com/") Daniel Rinehart 
-      | under an MIT License.
+      a(href="http://danielr.neophi.com/") Daniel Rinehart
+      |  under an MIT License.
 
     script(src="/js/jquery-1.9.1#{jsExt}")
     script(src="/js/bootstrap-2.3.0#{jsExt}")
@@ -85,7 +85,7 @@ html
       (function() {
         var dc, url;
         window.dc_opts = {
-          clientId: "874fadc7-5ba2-470a-a9d8-ca243fe08575",
+          clientId: "#{dailyCredId}",
           home: "https://www.dailycred.com"
         };
         dc = document.createElement("script");

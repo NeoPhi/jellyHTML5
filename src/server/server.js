@@ -33,12 +33,14 @@ levels.addRoutes(app);
 
 var jsExt = process.env.JS_EXT;
 var cssExt = process.env.CSS_EXT;
+var dailyCredId = process.env.DAILY_CRED_ID;
 
 app.get('/', function(req, res){
   res.render('home', {
     user: req.user,
     jsExt: jsExt,
-    cssExt: cssExt
+    cssExt: cssExt,
+    dailyCredId: dailyCredId
   });
 });
 
