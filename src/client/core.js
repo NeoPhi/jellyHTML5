@@ -220,23 +220,6 @@ function createJelly(x, y, color) {
     return transposeCoordinates(jelly.coordinates, dx, dy);
   }
 
-  function matches(testCoordinates) {
-    if (testCoordinates.length !== jelly.coordinates.length) {
-      return false;
-    }
-    var lookup = {};
-    jelly.coordinates.forEach(function(coordinates) {
-      lookup[coordinates.x + ':' + coordinates.y] = true;
-    });
-    var hits = 0;
-    testCoordinates.forEach(function(coordinates) {
-      if (lookup[coordinates.x + ':' + coordinates.y]) {
-        hits += 1;
-      }
-    });
-    return (hits === jelly.coordinates.length);
-  }
-
   function collides(testCoordinates) {
     return overlappingCoordinates(jelly.coordinates, testCoordinates);
   }
@@ -281,7 +264,6 @@ function createJelly(x, y, color) {
     updateAttachment: updateAttachment,
     addCoordinates: addCoordinates,
     targetCoordinates: targetCoordinates,
-    matches: matches,
     movable: movable,
     move: move,
     collides: collides,
