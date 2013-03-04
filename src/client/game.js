@@ -1,4 +1,5 @@
 var core = require('./core');
+var debug = require('debug')('game');
 
 var levels = [
   [
@@ -367,10 +368,11 @@ function isComplete(document, gameBoard) {
   }
 }
 
-function slideObject(document, gameBoard, event, left, context) {
+function slideObject(document, gameBoard, container, event, left, context) {
   event.preventDefault();
-  var x = Math.floor(event.offsetX / 40);
-  var y = Math.floor(event.offsetY / 40);
+
+  var x = Math.floor((event.pageX - container.offsetLeft) / 40);
+  var y = Math.floor((event.pageY - container.offsetTop) / 40);
   var coordinates = [{
     x: x,
     y: y
@@ -464,7 +466,8 @@ function construct(document, context) {
   return gameBoard;
 }
 
-function doIt(document, window) {
+function doIt(window) {
+  var document = window.document;
   var drawingCanvas = document.getElementById('board');
   if (drawingCanvas.getContext) {
     var context = drawingCanvas.getContext('2d');
@@ -490,11 +493,10 @@ function doIt(document, window) {
 
     var gameBoard = construct(document, context);
     drawGameBoard(gameBoard, context);
-    drawingCanvas.addEventListener('click', function(event) {
-      slideObject(document, gameBoard, event, true, context);
-    });
-    drawingCanvas.addEventListener('contextmenu', function(event) {
-      slideObject(document, gameBoard, event, false, context);
+    window.$('#board').on('click', function(event) {
+      slideObject(document, gameBoard, this, event, true, context);
+    }).on('contextmenu', function(event) {
+      slideObject(document, gameBoard, this, event, false, context);
     });
 
     document.getElementById('reset').addEventListener('click', function() {

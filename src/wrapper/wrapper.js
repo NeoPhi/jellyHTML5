@@ -1,4 +1,4 @@
 var game = require('../client/game');
 
-game.doIt(document, window);
+game.doIt(window);
 

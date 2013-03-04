@@ -4,6 +4,7 @@ describe('game.js', function() {
 
   var document;
   var window;
+  var $;
   var board;
   var context;
   var levels;
@@ -28,15 +29,19 @@ describe('game.js', function() {
     spyOn(status, 'appendChild').andCallThrough();
     levels.value = level;
 
-    game.doIt(document, window);
+    game.doIt(window);
 
     clicks.forEach(function(click) {
       var event = {
-        offsetX: click.x * 40 + 20,
-        offsetY: click.y * 40 + 20,
+        pageX: click.x * 40 + 20,
+        pageY: click.y * 40 + 20,
         preventDefault: function() {}
       };
-      board.eventListeners[click.method](event);
+      var that = {
+        offsetLeft: 0,
+        offsetTop: 0
+      };
+      board.eventListeners[click.method].call(that, event);
     });
     expect(status.appendChild.callCount).toBe(2, 'Level ' + (level + 1));
   }
@@ -69,6 +74,10 @@ describe('game.js', function() {
       },
       addEventListener: function(name, fn) {
         board.eventListeners[name] = fn;
+      },
+      on: function(name, fn) {
+        board.eventListeners[name] = fn;
+        return board;
       }
     };
 
@@ -106,19 +115,25 @@ describe('game.js', function() {
       }
     };
 
+    $ = function() {
+      return board;
+    };
+
     window = {
-      location: {}
+      document: document,
+      location: {},
+      $: $
     };
   });
 
   it('creates initial level', function() {
-    game.doIt(document, window);
+    game.doIt(window);
     expect(gameBoard.addObject.callCount).toBe(57);
   });
 
   it('creates complex level', function() {
     levels.value = 6;
-    game.doIt(document, window);
+    game.doIt(window);
     expect(gameBoard.addObject.callCount).toBe(62);
   });
 

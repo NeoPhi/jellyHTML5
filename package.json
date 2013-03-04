@@ -8,7 +8,8 @@
     "passport": "0.1.15",
     "passport-dailycred": "0.2.0",
     "mongoose": "3.5.7",
-    "connect-redis": "1.4.5"
+    "connect-redis": "1.4.5",
+    "debug": "0.7.2"
   },
   "devDependencies": {
     "jshint": "0.9.1",
