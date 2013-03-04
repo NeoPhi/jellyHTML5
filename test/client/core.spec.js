@@ -31,6 +31,24 @@ describe('core', function() {
     gameBoard.addObject(jelly);
   });
 
+  describe('construct', function() {
+    it('creates level', function() {
+      gameBoard = core.createGameBoard([
+        'x x x x x x x x x x x x x x ',
+        'x grl0        grl2glx     x ',
+        'x   l1gl        l2  x     x ',
+        'x l3l3l3        l4  x     x ',
+        'x gt  gt      g gtg       x ',
+        'x x x           x x x     x ',
+        'x x x           x x x     x ',
+        'x x x           x x x     x ',
+        'x x x                     x ',
+        'x x x x x x x x x x x x x x '
+      ]);
+      expect(gameBoard.getObjects().length).toBe(76);
+    });
+  });
+
   describe('slideLeft', function() {
     beforeEach(function() {
       wall = core.createWall(0, 1);

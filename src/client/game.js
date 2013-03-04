@@ -184,65 +184,8 @@ function slideObject(document, state, container, event, left) {
   }
 }
 
-function constructRow(row, y, gameBoard, objects, attachments) {
-  var parts = row.split(/(?:)/);
-  for (var i = 0; i < parts.length; i += 2) {
-    var letter = parts[i];
-    var control = parts[i + 1];
-    var x = Math.floor(i / 2);
-    if (letter === ' ') {
-      continue;
-    }
-    var object;
-    if (letter === 'x') {
-      object = core.createWall(x, y);
-    } else if (letter === 'l') {
-      object = core.createJelly(x, y, letter + control);
-      control = ' ';
-    } else {
-      object = core.createJelly(x, y, letter);
-    }
-    gameBoard.addObject(object);
-    objects[x + ',' + y] = object;
-    if (control === ' ') {
-      continue;
-    }
-    var dx = 0;
-    var dy = 0;
-    if (control === 't') {
-      dy = -1;
-    }
-    if (control === 'r') {
-      dx = 1;
-    }
-    if (control === 'b') {
-      dy = 1;
-    }
-    if (control === 'l') {
-      dx = -1;
-    }
-    attachments.push({
-      src: x + ',' + y,
-      dest: (x + dx) + ',' + (y + dy)
-    });
-  }
-}
-
 function construct(document, context, level) {
-  // TODO Level parsing should be part of core
-  var gameBoard = core.createGameBoard();
-  var objects = {};
-  var attachments = [];
-  level.layout.forEach(function(row, y) {
-    constructRow(row, y, gameBoard, objects, attachments);
-  });
-  attachments.forEach(function(attachment) {
-    var src = objects[attachment.src];
-    var dest = objects[attachment.dest];
-    // TODO this should be handled by attachment method
-    src.attach(dest, dest.movable());
-  });
-  gameBoard.postSetup();
+  var gameBoard = core.createGameBoard(level.layout);
   drawGameBoard(gameBoard, context);
   setStatus(document, '');
   return gameBoard;

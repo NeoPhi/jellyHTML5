@@ -1,6 +1,5 @@
 describe('game.js', function() {
   var game = require('../../src/client/game');
-  var core = require('../../src/client/core');
 
   var document;
   var window;
@@ -11,7 +10,6 @@ describe('game.js', function() {
   var level;
   var reset;
   var status;
-  var gameBoard;
   var objects;
 
   function createClick(x, y, left) {
@@ -47,13 +45,6 @@ describe('game.js', function() {
 
   beforeEach(function() {
     objects = [];
-
-    var orignalFn = core.createGameBoard;
-    spyOn(core, 'createGameBoard').andCallFake(function() {
-      gameBoard = orignalFn();
-      spyOn(gameBoard, 'addObject').andCallThrough();
-      return gameBoard;
-    });
 
     context = {
       clearRect: function() {},
@@ -153,11 +144,6 @@ describe('game.js', function() {
       },
       $: $
     };
-  });
-
-  it('creates level', function() {
-    game.doIt(window);
-    expect(gameBoard.addObject.callCount).toBe(81);
   });
 
   it('plays level', function() {

@@ -26,7 +26,128 @@ function addIfMissing(src, dest) {
   });
 }
 
-function createGameBoard() {
+function createJelly(x, y, color) {
+  var jelly;
+
+  function addCoordinates(x, y) {
+    jelly.coordinates.push({
+      x: x,
+      y: y
+    });
+  }
+
+  function affected() {
+    var result = jelly.attachments.slice(0);
+    result.push(jelly);
+    return result;
+  }
+
+  function attach(object, notify) {
+    addIfMissing([object], jelly.attachments);
+    if (notify) {
+      object.attach(jelly, false);
+    }
+  }
+
+  function updateAttachment(oldObject, newObject) {
+    var attachments = [];
+    jelly.attachments.forEach(function(attachment) {
+      if (oldObject === attachment) {
+        addIfMissing([newObject], attachments);
+      } else {
+        addIfMissing([attachment], attachments);
+      }
+    });
+    jelly.attachments = attachments;
+  }
+
+  function targetCoordinates(dx, dy) {
+    return transposeCoordinates(jelly.coordinates, dx, dy);
+  }
+
+  function collides(testCoordinates) {
+    return overlappingCoordinates(jelly.coordinates, testCoordinates);
+  }
+
+  function merges(object, testCoordinates) {
+    if (object.color !== jelly.color) {
+      return false;
+    }
+    return collides(testCoordinates);
+  }
+
+  function merge(object) {
+    object.coordinates.forEach(function(coordinates) {
+      addCoordinates(coordinates.x, coordinates.y);
+    });
+    addIfMissing(object.attachments, jelly.attachments);
+    object.attachments.forEach(function(attachment) {
+      // TODO add unit test around need for this check
+      if (attachment.updateAttachment) {
+        attachment.updateAttachment(object, jelly);
+      }
+    });
+  }
+
+  function mergable() {
+    return true;
+  }
+
+  function move(dx, dy) {
+    jelly.coordinates = transposeCoordinates(jelly.coordinates, dx, dy);
+  }
+
+  function movable() {
+    return true;
+  }
+
+  jelly = {
+    coordinates: [],
+    attachments: [],
+    affected: affected,
+    attach: attach,
+    updateAttachment: updateAttachment,
+    addCoordinates: addCoordinates,
+    targetCoordinates: targetCoordinates,
+    movable: movable,
+    move: move,
+    collides: collides,
+    color: color,
+    mergable: mergable,
+    merge: merge,
+    merges: merges
+  };
+  addCoordinates(x, y);
+  return jelly;
+}
+
+function createWall(x, y) {
+  var coordinates = [{
+    x: x,
+    y: y
+  }];
+
+  function collides(testCoordinates) {
+    return overlappingCoordinates(coordinates, testCoordinates);
+  }
+
+  function movable() {
+    return false;
+  }
+
+  function mergable() {
+    return false;
+  }
+
+  return {
+    movable: movable,
+    collides: collides,
+    mergable: mergable,
+    coordinates: coordinates
+  };
+}
+
+function createGameBoard(layout) {
   var objects = [];
 
   function addObject(object) {
@@ -172,133 +293,74 @@ function createGameBoard() {
     return objects;
   }
 
+  function constructRow(row, y, objectLookup, attachments) {
+    var parts = row.split(/(?:)/);
+    for (var i = 0; i < parts.length; i += 2) {
+      var letter = parts[i];
+      var control = parts[i + 1];
+      var x = Math.floor(i / 2);
+      if (letter === ' ') {
+        continue;
+      }
+      var object;
+      if (letter === 'x') {
+        object = createWall(x, y);
+      } else if (letter === 'l') {
+        object = createJelly(x, y, letter + control);
+        control = ' ';
+      } else {
+        object = createJelly(x, y, letter);
+      }
+      addObject(object);
+      objectLookup[x + ',' + y] = object;
+      if (control === ' ') {
+        continue;
+      }
+      var dx = 0;
+      var dy = 0;
+      if (control === 't') {
+        dy = -1;
+      }
+      if (control === 'r') {
+        dx = 1;
+      }
+      if (control === 'b') {
+        dy = 1;
+      }
+      if (control === 'l') {
+        dx = -1;
+      }
+      attachments.push({
+        src: x + ',' + y,
+        dest: (x + dx) + ',' + (y + dy)
+      });
+    }
+  }
+
+  function construct(layout) {
+    var attachments = [];
+    var objectLookup = {};
+    layout.forEach(function(row, y) {
+      constructRow(row, y, objectLookup, attachments);
+    });
+    attachments.forEach(function(attachment) {
+      var src = objectLookup[attachment.src];
+      var dest = objectLookup[attachment.dest];
+      src.attach(dest, dest.movable());
+    });
+    postSetup();
+  }
+
+  if (layout) {
+    construct(layout);
+  }
+
   return {
     addObject: addObject,
     slideLeft: slideLeft,
     slideRight: slideRight,
     postSetup: postSetup,
     getObjects: getObjects
-  };
-}
-
-function createJelly(x, y, color) {
-  var jelly;
-
-  function addCoordinates(x, y) {
-    jelly.coordinates.push({
-      x: x,
-      y: y
-    });
-  }
-
-  function affected() {
-    var result = jelly.attachments.slice(0);
-    result.push(jelly);
-    return result;
-  }
-
-  function attach(object, notify) {
-    addIfMissing([object], jelly.attachments);
-    if (notify) {
-      object.attach(jelly, false);
-    }
-  }
-
-  function updateAttachment(oldObject, newObject) {
-    var attachments = [];
-    jelly.attachments.forEach(function(attachment) {
-      if (oldObject === attachment) {
-        addIfMissing([newObject], attachments);
-      } else {
-        addIfMissing([attachment], attachments);
-      }
-    });
-    jelly.attachments = attachments;
-  }
-
-  function targetCoordinates(dx, dy) {
-    return transposeCoordinates(jelly.coordinates, dx, dy);
-  }
-
-  function collides(testCoordinates) {
-    return overlappingCoordinates(jelly.coordinates, testCoordinates);
-  }
-
-  function merges(object, testCoordinates) {
-    if (object.color !== jelly.color) {
-      return false;
-    }
-    return collides(testCoordinates);
-  }
-
-  function merge(object) {
-    object.coordinates.forEach(function(coordinates) {
-      addCoordinates(coordinates.x, coordinates.y);
-    });
-    addIfMissing(object.attachments, jelly.attachments);
-    object.attachments.forEach(function(attachment) {
-      // TODO add unit test around need for this check
-      if (attachment.updateAttachment) {
-        attachment.updateAttachment(object, jelly);
-      }
-    });
-  }
-
-  function mergable() {
-    return true;
-  }
-
-  function move(dx, dy) {
-    jelly.coordinates = transposeCoordinates(jelly.coordinates, dx, dy);
-  }
-
-  function movable() {
-    return true;
-  }
-
-  jelly = {
-    coordinates: [],
-    attachments: [],
-    affected: affected,
-    attach: attach,
-    updateAttachment: updateAttachment,
-    addCoordinates: addCoordinates,
-    targetCoordinates: targetCoordinates,
-    movable: movable,
-    move: move,
-    collides: collides,
-    color: color,
-    mergable: mergable,
-    merge: merge,
-    merges: merges
-  };
-  addCoordinates(x, y);
-  return jelly;
-}
-
-function createWall(x, y) {
-  var coordinates = [{
-    x: x,
-    y: y
-  }];
-
-  function collides(testCoordinates) {
-    return overlappingCoordinates(coordinates, testCoordinates);
-  }
-
-  function movable() {
-    return false;
-  }
-
-  function mergable() {
-    return false;
-  }
-
-  return {
-    movable: movable,
-    collides: collides,
-    mergable: mergable,
-    coordinates: coordinates
   };
 }
 
