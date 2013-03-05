@@ -275,12 +275,27 @@ function createGameBoard(layout) {
     return (objectsToMove.length !== 0);
   }
 
-  function slideLeft(object) {
-    return slide(object, -1, 0);
-  }
-
-  function slideRight(object) {
-    return slide(object, 1, 0);
+  // TODO: Optimize
+  function click(x, y, left) {
+    var dx = 1;
+    if (left) {
+      dx = -1;
+    }
+    var coordinates = [{
+      x: x,
+      y: y
+    }];
+    for (var i = 0; i < objects.length; i += 1) {
+      var object = objects[i];
+      if (!object.collides(coordinates)) {
+        continue;
+      }
+      if (!object.movable()) {
+        return false;
+      }
+      return slide(object, dx);
+    }
+    return false;
   }
 
   function postSetup() {
@@ -291,6 +306,20 @@ function createGameBoard(layout) {
 
   function getObjects() {
     return objects;
+  }
+
+  function complete() {
+    var colors = {};
+    return getObjects().every(function(object) {
+      if (!object.mergable()) {
+        return true;
+      }
+      if (object.color in colors) {
+        return false;
+      }
+      colors[object.color] = 1;
+      return true;
+    });
   }
 
   function constructRow(row, y, objectLookup, attachments) {
@@ -357,10 +386,10 @@ function createGameBoard(layout) {
 
   return {
     addObject: addObject,
-    slideLeft: slideLeft,
-    slideRight: slideRight,
+    click: click,
     postSetup: postSetup,
-    getObjects: getObjects
+    getObjects: getObjects,
+    complete: complete
   };
 }
 

@@ -1,4 +1,4 @@
-describe('core', function() {
+describe('client/core', function() {
   var core = require('../../src/client/core');
 
   var jelly;
@@ -49,13 +49,21 @@ describe('core', function() {
     });
   });
 
-  describe('slideLeft', function() {
+  describe('click', function() {
     beforeEach(function() {
       wall = core.createWall(0, 1);
     });
 
+    it('ignores a click not on an object', function() {
+      expect(gameBoard.click(10, 10, false)).toBe(false);
+    });
+
+    it('ignores a click on a wall', function() {
+      expect(gameBoard.click(0, 2, false)).toBe(false);
+    });
+
     it('can move a jelly on an empty board', function() {
-      expect(gameBoard.slideLeft(jelly)).toBe(true);
+      expect(gameBoard.click(1, 1, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -67,7 +75,7 @@ describe('core', function() {
       gameBoard.addObject(jelly2);
 
       var originalCount = gameBoard.getObjects().length;
-      expect(gameBoard.slideLeft(jelly2)).toBe(true);
+      expect(gameBoard.click(3, 1, true)).toBe(true);
       matches([{
         x: 1,
         y: 1
@@ -86,7 +94,7 @@ describe('core', function() {
       gameBoard.addObject(jelly3);
 
       var originalCount = gameBoard.getObjects().length;
-      expect(gameBoard.slideLeft(jelly3)).toBe(true);
+      expect(gameBoard.click(3, -1, true)).toBe(true);
       matches([{
         x: 1,
         y: 1
@@ -105,7 +113,7 @@ describe('core', function() {
       gameBoard.addObject(jelly2);
       jelly2.attach(jelly, true);
       gameBoard.addObject(wall);
-      expect(gameBoard.slideLeft(jelly2)).toBe(false);
+      expect(gameBoard.click(1, 0, true)).toBe(false);
       matches([{
         x: 1,
         y: 1
@@ -120,7 +128,7 @@ describe('core', function() {
       jelly.addCoordinates(3, 1);
       var jelly2 = core.createJelly(2, 1, 'b');
       gameBoard.addObject(jelly2);
-      expect(gameBoard.slideLeft(jelly2)).toBe(true);
+      expect(gameBoard.click(2, 1, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -144,7 +152,7 @@ describe('core', function() {
       gameBoard.addObject(jelly3);
       jelly3.attach(jelly2, true);
 
-      expect(gameBoard.slideLeft(jelly2)).toBe(true);
+      expect(gameBoard.click(2, 1, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -170,7 +178,7 @@ describe('core', function() {
       var jelly2 = core.createJelly(2, 1, 'b');
       gameBoard.addObject(jelly2);
 
-      expect(gameBoard.slideLeft(jelly2)).toBe(false);
+      expect(gameBoard.click(2, 1, true)).toBe(false);
       matches([{
         x: 1,
         y: 1
@@ -185,7 +193,7 @@ describe('core', function() {
       var jelly2 = core.createJelly(1, 0, 'b');
       gameBoard.addObject(jelly2);
       jelly2.attach(jelly, true);
-      expect(gameBoard.slideLeft(jelly2)).toBe(true);
+      expect(gameBoard.click(1, 0, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -201,7 +209,7 @@ describe('core', function() {
       gameBoard.addObject(jelly2);
       jelly2.attach(jelly, true);
       
-      expect(gameBoard.slideLeft(jelly)).toBe(true);
+      expect(gameBoard.click(1, 1, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -214,7 +222,7 @@ describe('core', function() {
 
     it('does not move a jelly next to a wall', function() {
       gameBoard.addObject(wall);
-      expect(gameBoard.slideLeft(jelly)).toBe(false);
+      expect(gameBoard.click(1, 1, true)).toBe(false);
       matches([{
         x: 1,
         y: 1
@@ -224,7 +232,7 @@ describe('core', function() {
     it('can move a jelly next to another jelly', function() {
       var jelly2 = core.createJelly(0, 1, 'b');
       gameBoard.addObject(jelly2);
-      expect(gameBoard.slideLeft(jelly)).toBe(true);
+      expect(gameBoard.click(1, 1, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -239,14 +247,14 @@ describe('core', function() {
       var jelly2 = core.createJelly(2, 1, 'b');
       gameBoard.addObject(jelly2);
       gameBoard.addObject(wall);
-      expect(gameBoard.slideLeft(jelly2)).toBe(false);
+      expect(gameBoard.click(2, 1, true)).toBe(false);
     });
 
     it('accounts for vertical position', function() {
       var jelly2 = core.createJelly(2, 0, 'b');
       gameBoard.addObject(jelly2);
       gameBoard.addObject(wall);
-      expect(gameBoard.slideLeft(jelly2)).toBe(true);
+      expect(gameBoard.click(2, 0, true)).toBe(true);
       matches([{
         x: 1,
         y: 1
@@ -260,7 +268,7 @@ describe('core', function() {
     it('applies gravity after move', function() {
       var jelly2 = core.createJelly(1, 0, 'b');
       gameBoard.addObject(jelly2);
-      expect(gameBoard.slideLeft(jelly)).toBe(true);
+      expect(gameBoard.click(1, 1, true)).toBe(true);
       matches([{
         x: 0,
         y: 1
@@ -276,7 +284,7 @@ describe('core', function() {
       jelly2.addCoordinates(2, 1);
       gameBoard.addObject(jelly2);
       gameBoard.addObject(wall);
-      expect(gameBoard.slideLeft(jelly2)).toBe(false);
+      expect(gameBoard.click(2, 0, true)).toBe(false);
       matches([{
         x: 1,
         y: 1
@@ -294,100 +302,7 @@ describe('core', function() {
       var jelly2 = core.createJelly(2, -1, 'b');
       gameBoard.addObject(jelly2);
       gameBoard.addObject(wall);
-      expect(gameBoard.slideLeft(jelly2)).toBe(true);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 0
-      }], jelly2.coordinates);
-    });
-  });
-
-  describe('slideRight', function() {
-    beforeEach(function() {
-      wall = core.createWall(2, 1);
-    });
-
-    it('can move a jelly on an empty board', function() {
-      expect(gameBoard.slideRight(jelly)).toBe(true);
-      matches([{
-        x: 2,
-        y: 1
-      }], jelly.coordinates);
-    });
-
-    it('does not move a jelly next to a wall', function() {
-      gameBoard.addObject(wall);
-      expect(gameBoard.slideRight(jelly)).toBe(false);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-    });
-
-    it('can move a jelly next to another jelly', function() {
-      var jelly2 = core.createJelly(0, 1, 'b');
-      gameBoard.addObject(jelly2);
-      expect(gameBoard.slideRight(jelly2)).toBe(true);
-      matches([{
-        x: 2,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('follows the chain', function() {
-      var jelly2 = core.createJelly(0, 1, 'b');
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.slideRight(jelly2)).toBe(false);
-    });
-
-    it('accounts for vertical position', function() {
-      var jelly2 = core.createJelly(0, 0, 'b');
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.slideRight(jelly2)).toBe(true);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 0
-      }], jelly2.coordinates);
-    });
-
-    it('accounts for height', function() {
-      var jelly2 = core.createJelly(0, 0, 'b');
-      jelly2.addCoordinates(0, 1);
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.slideRight(jelly2)).toBe(false);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 0,
-        y: 0
-      }, {
-        x: 0,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('falls after moving', function() {
-      var jelly2 = core.createJelly(0, -1, 'b');
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.slideRight(jelly2)).toBe(true);
+      expect(gameBoard.click(2, -1, true)).toBe(true);
       matches([{
         x: 1,
         y: 1

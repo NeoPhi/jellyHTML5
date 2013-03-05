@@ -133,19 +133,7 @@ function setStatus(document, text) {
 }
 
 function isComplete(document, gameBoard) {
-  var colors = {};
-  var complete = true;
-  gameBoard.getObjects().forEach(function(object) {
-    if (!object.mergable()) {
-      return;
-    }
-    if (object.color in colors) {
-      complete = false;
-    } else {
-      colors[object.color] = 1;
-    }
-  });
-  if (complete) {
+  if (gameBoard.complete()) {
     setStatus(document, 'COMPLETE!');
   }
 }
@@ -157,30 +145,11 @@ function slideObject(document, state, container, event, left) {
 
   var x = Math.floor((event.pageX - container.offsetLeft) / 40);
   var y = Math.floor((event.pageY - container.offsetTop) / 40);
-  var coordinates = [{
-    x: x,
-    y: y
-  }];
   // console.log('      createClick(' + x + ', ' + y + ', ' + left + '),');
-  var objects = gameBoard.getObjects();
-  for (var i = 0; i < objects.length; i += 1) {
-    var object = objects[i];
-    if (object.collides(coordinates)) {
-      if (!object.movable()) {
-        return;
-      }
-      var moved;
-      if (left) {
-        moved = gameBoard.slideLeft(object);
-      } else {
-        moved = gameBoard.slideRight(object);
-      }
-      if (moved) {
-        drawGameBoard(gameBoard, context);
-        isComplete(document, gameBoard);
-      }
-      return;
-    }
+
+  if (gameBoard.click(x, y, left)) {
+    drawGameBoard(gameBoard, context);
+    isComplete(document, gameBoard);
   }
 }
 

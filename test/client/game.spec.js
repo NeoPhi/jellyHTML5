@@ -1,4 +1,4 @@
-describe('game.js', function() {
+describe('client/game', function() {
   var game = require('../../src/client/game');
 
   var document;
