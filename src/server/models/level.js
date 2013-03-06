@@ -20,13 +20,16 @@ var LevelSchema = mongoose.Schema({
   }
 });
 
-function toClient(summary) {
+function toClient(summary, status) {
   var result = {
     id: this.id.toString(),
     name: this.name
   };
   if (!summary) {
     result.layout = JSON.parse(this.layout);
+  }
+  if (status) {
+    result.status = status.toClient();
   }
   return result;
 }

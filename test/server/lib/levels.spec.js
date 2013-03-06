@@ -1,6 +1,7 @@
 describe('server/lib/levels', function() {
   var levels = require('../../../src/server/lib/levels');
   var Level = require('../../../src/server/models/level').model;
+  var Status = require('../../../src/server/models/status').model;
   var verifier = require('../../../src/server/lib/verifier');
   var app;
   var req;
@@ -39,6 +40,9 @@ describe('server/lib/levels', function() {
       spyOn(Level, 'find').andCallFake(function(query, callback) {
         callback(error);
       });
+      spyOn(Status, 'findForUser').andCallFake(function(user, callback) {
+        callback(undefined, []);
+      });
       app.operations.get['/levels/'](req, res, next);
       expect(Level.find.callCount).toBe(1);
       expect(Level.find.argsForCall[0][0]).toEqual({});
@@ -48,6 +52,9 @@ describe('server/lib/levels', function() {
 
     it('handles no levels', function() {
       spyOn(Level, 'find').andCallFake(function(query, callback) {
+        callback(undefined, []);
+      });
+      spyOn(Status, 'findForUser').andCallFake(function(user, callback) {
         callback(undefined, []);
       });
       app.operations.get['/levels/'](req, res, next);
@@ -63,6 +70,9 @@ describe('server/lib/levels', function() {
       spyOn(Level, 'find').andCallFake(function(query, callback) {
         callback(undefined, [level]);
       });
+      spyOn(Status, 'findForUser').andCallFake(function(user, callback) {
+        callback(undefined, []);
+      });
       app.operations.get['/levels/'](req, res, next);
       expect(Level.find.callCount).toBe(1);
       expect(Level.find.argsForCall[0][0]).toEqual({});
@@ -77,6 +87,9 @@ describe('server/lib/levels', function() {
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
         callback(error);
       });
+      spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
+        callback();
+      });
       req.params.id = '123';
       app.operations.get['/levels/:id'](req, res, next);
       expect(Level.findById.callCount).toBe(1);
@@ -87,6 +100,9 @@ describe('server/lib/levels', function() {
 
     it('handles no level', function() {
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
+        callback();
+      });
+      spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
         callback();
       });
       req.params.id = '123';
@@ -102,17 +118,21 @@ describe('server/lib/levels', function() {
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
         callback(undefined, level);
       });
+      spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
+        callback();
+      });
       req.params.id = '123';
       app.operations.get['/levels/:id'](req, res, next);
       expect(Level.findById.callCount).toBe(1);
       expect(Level.findById.argsForCall[0][0]).toBe(req.params.id);
       expect(level.toClient.callCount).toBe(1);
-      expect(level.toClient.argsForCall[0][0]).toBeUndefined();
+      expect(level.toClient.argsForCall[0][0]).toBe(false);
       expect(res.send.callCount).toBe(1);
       expect(res.send.argsForCall[0][0]).toBe('LEVEL');
     });
   });
 
+  // TODO add unit tests that show update/create of status object
   describe('POST /levels/:id/verify', function() {
     it('handles verification error', function() {
       var error = new Error();
@@ -121,6 +141,9 @@ describe('server/lib/levels', function() {
       });
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
         callback(undefined, level);
+      });
+      spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
+        callback();
       });
       spyOn(verifier, 'check').andCallFake(function(layout, solution, callback) {
         callback(error);
@@ -142,8 +165,11 @@ describe('server/lib/levels', function() {
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
         callback(undefined, level);
       });
+      spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
+        callback();
+      });
       spyOn(verifier, 'check').andCallFake(function(layout, solution, callback) {
-        callback(undefined, true);
+        callback(undefined, 'CHECKED');
       });
       req.params.id = '123';
       req.body.solution = 'SOLUTION';
@@ -152,9 +178,7 @@ describe('server/lib/levels', function() {
       expect(verifier.check.argsForCall[0][0]).toBe('LAYOUT');
       expect(verifier.check.argsForCall[0][1]).toBe('SOLUTION');
       expect(res.send.callCount).toBe(1);
-      expect(res.send.argsForCall[0][0]).toEqual({
-        valid: true
-      });
+      expect(res.send.argsForCall[0][0]).toBe('CHECKED');
     });
   });
 });

@@ -160,6 +160,7 @@ function checkComplete(state) {
       contentType: 'application/json; charset=utf-8',
       type: 'POST',
       success: function(result) {
+        // TODO Update client side HTML to reflect change
         if (result.valid) {
           setStatus(state, 'VERIFIED!');
         } else {
@@ -214,8 +215,20 @@ function loadLevels(state) {
     url: '/levels/',
     success: function(levels) {
       state.window.$('#levels').html(function() {
+        // TODO Use client side templating engine
+        // possibly something with bindings as this can change
         return levels.map(function(level) {
-          return '<li><button class="btn" data-level="' + level.id + '">' + level.name + '</button></li>';
+          var html = [
+            '<li>',
+            '<button class="btn" data-level="' + level.id + '">' + level.name + '</button>'
+          ];
+          html.push('</li>');
+          if (level.status) {
+            if (level.status.clicks > 0) {
+              html.push(' Current best: ' + level.status.clicks);
+            }
+          }
+          return html.join('');
         }).join('');
       }).on('click', function(event) {
         var id = state.window.$(event.target).data('level');

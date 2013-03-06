@@ -23,7 +23,7 @@ describe('server/lib/verifier', function() {
   describe('check', function() {
     it('handles no solution', function() {
       gameBoard.complete.andReturn(false);
-      verifier.check('LAYOUT', [], function(err, valid) {
+      verifier.check('LAYOUT', [], function(err, result) {
         if (err) {
           throw err;
         }
@@ -31,12 +31,16 @@ describe('server/lib/verifier', function() {
         expect(core.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
         expect(gameBoard.click.callCount).toBe(0);
         expect(gameBoard.complete.callCount).toBe(1);
-        expect(valid).toBe(false);
+        expect(result).toEqual({
+          valid: false,
+          clicks: 0
+        });
         done = true;
       });
     });
 
     it('handles multiple step solution', function() {
+      gameBoard.click.andReturn(true);
       gameBoard.complete.andReturn(true);
       verifier.check('LAYOUT', [{
         x: 1,
@@ -46,7 +50,7 @@ describe('server/lib/verifier', function() {
         x: 2,
         y: 1,
         left: true
-      }], function(err, valid) {
+      }], function(err, result) {
         if (err) {
           throw err;
         }
@@ -60,7 +64,10 @@ describe('server/lib/verifier', function() {
         expect(gameBoard.click.argsForCall[1][1]).toBe(1);
         expect(gameBoard.click.argsForCall[1][2]).toBe(true);
         expect(gameBoard.complete.callCount).toBe(1);
-        expect(valid).toBe(true);
+        expect(result).toEqual({
+          valid: true,
+          clicks: 2
+        });
         done = true;
       });
     });
