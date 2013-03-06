@@ -1,5 +1,10 @@
 var core = require('./core');
 
+var WIDTH = 40;
+var HEIGHT = 40;
+var MARGIN = 1;
+var RADIUS = 10;
+
 // https://developer.mozilla.org/en-US/docs/HTML/Canvas/Tutorial/Drawing_shapes
 
 function roundedRect(context, x, y, width, height, radius){
@@ -21,10 +26,10 @@ function drawConnections(object, lookup, context) {
     var x = coordinates.x;
     var y = coordinates.y;
     if (lookup[(x + 1) + ',' + y]) {
-      context.fillRect((x + 1) * 40 - 10, y * 40 + 1, 20, 38);
+      context.fillRect(((x + MARGIN) * WIDTH) - RADIUS, (y * HEIGHT) + MARGIN, RADIUS * 2, HEIGHT - (MARGIN * 2));
     }
     if (lookup[x + ',' + (y + 1)]) {
-      context.fillRect(x * 40 + 1, (y + 1) * 40 - 10, 38, 20);
+      context.fillRect((x * WIDTH) + MARGIN, ((y + MARGIN) * HEIGHT) - RADIUS, WIDTH - (MARGIN * 2), RADIUS * 2);
     }
   });
 }
@@ -45,35 +50,36 @@ function setFillStyle(color, context) {
   }
 }
 
-function drawAttachment(object, context) {
-  setFillStyle(object.color, context);
+function drawAttachment(state, object) {
+  setFillStyle(object.color, state.context);
   object.coordinates.forEach(function(coordinates) {
     var x = coordinates.x;
     var y = coordinates.y;
+    var spacing = RADIUS / 2;
     object.attachments.forEach(function(attachment) {
       if (attachment.collides([{
         x: x + 1,
         y: y
       }])) {
-        context.fillRect((x + 1) * 40 - 5, y * 40 + 15, 15, 10);
+        state.context.fillRect((x + MARGIN) * WIDTH - spacing, (y * HEIGHT) + (spacing * 3), spacing * 3, spacing * 2);
       }
       if (attachment.collides([{
         x: x - 1,
         y: y
       }])) {
-        context.fillRect(x * 40 - 10, y * 40 + 15, 15, 10);
+        state.context.fillRect((x * WIDTH) - (spacing * 2), (y * HEIGHT) + (spacing * 3), spacing * 3, spacing * 2);
       }
       if (attachment.collides([{
         x: x,
         y: y + 1
       }])) {
-        context.fillRect(x * 40 + 15, (y + 1) * 40 - 5, 10, 15);
+        state.context.fillRect((x * WIDTH) + (spacing * 3), ((y + MARGIN) * HEIGHT) - spacing, (spacing * 2), (spacing * 3));
       }
       if (attachment.collides([{
         x: x,
         y: y - 1
       }])) {
-        context.fillRect(x * 40 + 15, y * 40 - 10, 10, 15);
+        state.context.fillRect((x * WIDTH) + (spacing * 3), (y * HEIGHT) - (spacing * 2), spacing * 2, spacing * 3);
       }
     });
   });
@@ -86,18 +92,19 @@ function drawObject(object, lookup, doConnect, context) {
   object.coordinates.forEach(function(coordinates) {
     var x = coordinates.x;
     var y = coordinates.y;
-    roundedRect(context, x * 40 + 1, y * 40 + 1, 38, 38, 10);
+    roundedRect(context, (x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), HEIGHT - (MARGIN * 2), RADIUS);
   });
   if (doConnect) {
     drawConnections(object, lookup, context);
   }
 }
 
-function drawGameBoard(gameBoard, context) {
-  context.clearRect(0, 0, 560, 400);
+function drawGameBoard(state) {
+  var context = state.context;
+  context.clearRect(0, 0, WIDTH * 14, HEIGHT * 10);
   var walls = [];
   var wallLookup = {};
-  gameBoard.getObjects().forEach(function(object) {
+  state.gameBoard.getObjects().forEach(function(object) {
     var lookup = {};
     var doConnect = true;
     if (object.color) {
@@ -113,105 +120,123 @@ function drawGameBoard(gameBoard, context) {
   walls.forEach(function(wall) {
     drawConnections(wall, wallLookup, context);
   });
-  gameBoard.getObjects().forEach(function(object) {
+  state.gameBoard.getObjects().forEach(function(object) {
     if (!object.attachments || (object.attachments.length === 0)) {
       return;
     }
     if (object.color.charAt(0) === 'l') {
       return;
     }
-    drawAttachment(object, context);
+    drawAttachment(state, object);
   });
 }
 
-function setStatus(document, text) {
-  var status = document.getElementById('status');
+function updateButtons(state) {
+  var reset = state.window.$('#reset');
+  if (state.moves.length === 0) {
+    reset.addClass('disabled');
+  } else {
+    reset.removeClass('disabled');
+  }
+}
+
+function setStatus(state, text) {
+  var status = state.document.getElementById('status');
   while (status.firstChild) {
     status.removeChild(status.firstChild);
   }
-  status.appendChild(document.createTextNode(text));
+  status.appendChild(state.document.createTextNode(text));
 }
 
-function isComplete(document, gameBoard) {
-  if (gameBoard.complete()) {
-    setStatus(document, 'COMPLETE!');
+function checkComplete(state) {
+  if (state.gameBoard.complete()) {
+    setStatus(state, 'COMPLETE!');
   }
 }
 
-function slideObject(document, state, container, event, left) {
-  var gameBoard = state.gameBoard;
-  var context = state.context;
+function slideObject(state, container, event, left) {
   event.preventDefault();
 
-  var x = Math.floor((event.pageX - container.offsetLeft) / 40);
-  var y = Math.floor((event.pageY - container.offsetTop) / 40);
+  var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
+  var y = Math.floor((event.pageY - container.offsetTop) / HEIGHT);
   // console.log('      createClick(' + x + ', ' + y + ', ' + left + '),');
 
-  if (gameBoard.click(x, y, left)) {
-    drawGameBoard(gameBoard, context);
-    isComplete(document, gameBoard);
+  state.moves.push({
+    x: x,
+    y: y,
+    left: left
+  });
+  if (state.gameBoard.click(x, y, left)) {
+    drawGameBoard(state);
+    updateButtons(state);
+    checkComplete(state);
   }
 }
 
-function construct(document, context, level) {
-  var gameBoard = core.createGameBoard(level.layout);
-  drawGameBoard(gameBoard, context);
-  setStatus(document, '');
-  return gameBoard;
+function resetLevel(state) {
+  state.gameBoard = core.createGameBoard(state.level.layout);
+  state.moves = [];
+  drawGameBoard(state);
+  updateButtons(state);
+  setStatus(state, '');
 }
 
-function loadLevel(window, id, state) {
-  window.$.ajax({
+function loadLevel(state, id) {
+  state.window.$.ajax({
     url: '/levels/' + id,
-    success: function(data) {
-      window.location.hash = '#' + id;
-      state.gameBoard = construct(window.document, state.context, data);
+    success: function(level) {
+      state.window.location.hash = '#' + id;
+      state.level = level;
+      resetLevel(state);
     }
   });
 }
 
-function loadLevels(window, state) {
-  window.$.ajax({
+function loadLevels(state) {
+  state.window.$.ajax({
     url: '/levels/',
-    success: function(data) {
-      window.$('#levels').html(function() {
-        var levels = data.map(function(level) {
+    success: function(levels) {
+      state.window.$('#levels').html(function() {
+        return levels.map(function(level) {
           return '<li><button class="btn" data-level="' + level.id + '">' + level.name + '</button></li>';
-        });
-        return levels.join('');
+        }).join('');
       }).on('click', function(event) {
-        loadLevel(window, window.$(event.target).data('level'), state);
+        var id = state.window.$(event.target).data('level');
+        if (id) {
+          loadLevel(state, id);
+        }
       });
-      if (window.location.hash) {
-        loadLevel(window, window.location.hash.substring(1), state);
+      if (state.window.location.hash) {
+        loadLevel(state, state.window.location.hash.substring(1));
       }
     }
   });
 }
 
 function doIt(window) {
-  var document = window.document;
-  var drawingCanvas = document.getElementById('board');
+  var state = {
+    window: window,
+    document: window.document
+  };
+  var drawingCanvas = state.document.getElementById('board');
   if (drawingCanvas.getContext) {
-    var context = drawingCanvas.getContext('2d');
-    var state = {
-      context: context
-    };
-    loadLevels(window, state);
+    state.context = drawingCanvas.getContext('2d');
+    loadLevels(state);
 
     window.$('#board').on('click', function(event) {
-      slideObject(document, state, this, event, true);
+      slideObject(state, this, event, true);
     }).on('contextmenu', function(event) {
-      slideObject(document, state, this, event, false);
+      slideObject(state, this, event, false);
     });
 
-    /*
-    document.getElementById('reset').addEventListener('click', function() {
-      gameBoard = construct(document, context);
+    window.$('#reset').on('click', function(event) {
+      if (window.$(event.target).hasClass('disabled')) {
+        return;
+      }
+      resetLevel(state);
     });
-    */
   } else {
-    setStatus(document, 'Unable to get drawing context');
+    setStatus(state, 'Unable to get drawing context');
   }
 }
 

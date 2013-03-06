@@ -4,9 +4,11 @@ describe('client/game', function() {
   var document;
   var window;
   var $;
+  var $lookup;
   var board;
   var context;
   var levels;
+  var levelsList;
   var level;
   var reset;
   var status;
@@ -24,22 +26,23 @@ describe('client/game', function() {
     };
   }
 
+  function injectClick(click) {
+    var event = {
+      pageX: click.x * 40 + 20,
+      pageY: click.y * 40 + 20,
+      preventDefault: function() {}
+    };
+    var that = {
+      offsetLeft: 0,
+      offsetTop: 0
+    };
+    board.eventListeners[click.method].call(that, event);
+  }
+
   function playLevel(clicks) {
     spyOn(status, 'appendChild').andCallThrough();
     game.doIt(window);
-
-    clicks.forEach(function(click) {
-      var event = {
-        pageX: click.x * 40 + 20,
-        pageY: click.y * 40 + 20,
-        preventDefault: function() {}
-      };
-      var that = {
-        offsetLeft: 0,
-        offsetTop: 0
-      };
-      board.eventListeners[click.method].call(that, event);
-    });
+    clicks.forEach(injectClick);
     expect(status.appendChild.callCount).toBe(2);
   }
 
@@ -72,10 +75,12 @@ describe('client/game', function() {
     };
 
     levels = {
+      eventListeners: {},
       html: function() {
         return levels;
       },
-      on: function() {
+      on: function(name, fn) {
+        levels.eventListeners[name] = fn;
         return levels;
       }
     };
@@ -95,8 +100,18 @@ describe('client/game', function() {
       ]
     };
 
+    levelsList = [];
+
     reset = {
-      addEventListener: function() {}
+      eventListeners: {},
+      addEventListener: function() {},
+      addClass: jasmine.createSpy(),
+      hasClass: jasmine.createSpy(),
+      removeClass: jasmine.createSpy(),
+      on: function(name, fn) {
+        reset.eventListeners[name] = fn;
+        return reset;
+      }
     };
 
     status = {
@@ -124,15 +139,17 @@ describe('client/game', function() {
       }
     };
 
+    $lookup = {
+      '#board': board,
+      '#levels': levels,
+      '#reset': reset
+    };
     $ = function(name) {
-      return {
-        '#board': board,
-        '#levels': levels
-      }[name];
+      return $lookup[name];
     };
     $.ajax = function(options) {
       if (options.url === '/levels/') {
-        return options.success([]);
+        return options.success(levelsList);
       }
       options.success(level);
     };
@@ -144,6 +161,72 @@ describe('client/game', function() {
       },
       $: $
     };
+  });
+
+  it('creates game board', function() {
+    spyOn(levels, 'html').andCallThrough();
+    game.doIt(window);
+    expect(levels.html.callCount).toBe(1);
+    var html = levels.html.argsForCall[0][0]();
+    expect(html).toBe('');
+  });
+
+  it('resets level', function() {
+    game.doIt(window);
+    expect(reset.hasClass.callCount).toBe(0);
+    expect(reset.addClass.callCount).toBe(1);
+    expect(reset.addClass.argsForCall[0][0]).toBe('disabled');
+    expect(reset.removeClass.callCount).toBe(0);
+    injectClick(createClick(2, 2, false));
+    expect(reset.hasClass.callCount).toBe(0);
+    expect(reset.addClass.callCount).toBe(1);
+    expect(reset.removeClass.callCount).toBe(1);
+    expect(reset.removeClass.argsForCall[0][0]).toBe('disabled');
+    reset.eventListeners.click.call(reset, {
+      target: '#reset'
+    });
+    expect(reset.hasClass.callCount).toBe(1);
+    expect(reset.hasClass.argsForCall[0][0]).toBe('disabled');
+    expect(reset.addClass.callCount).toBe(2);
+    expect(reset.addClass.argsForCall[1][0]).toBe('disabled');
+    expect(reset.removeClass.callCount).toBe(1);
+  });
+
+  it('ignores reset', function() {
+    reset.hasClass.andReturn(true);
+    game.doIt(window);
+    expect(reset.hasClass.callCount).toBe(0);
+    expect(reset.addClass.callCount).toBe(1);
+    expect(reset.addClass.argsForCall[0][0]).toBe('disabled');
+    expect(reset.removeClass.callCount).toBe(0);
+    reset.eventListeners.click.call(reset, {
+      target: '#reset'
+    });
+    expect(reset.hasClass.callCount).toBe(1);
+    expect(reset.hasClass.argsForCall[0][0]).toBe('disabled');
+    expect(reset.addClass.callCount).toBe(1);
+    expect(reset.removeClass.callCount).toBe(0);
+  });
+
+  it('loads levels and handles click', function() {
+    delete window.location.hash;
+    levelsList = [level];
+    spyOn(levels, 'html').andCallThrough();
+    game.doIt(window);
+    expect(levels.html.callCount).toBe(1);
+    var html = levels.html.argsForCall[0][0]();
+    expect(html).not.toBe('');
+    var target = {
+      data: function() {
+        return 'ID';
+      }
+    };
+    $lookup.target = target;
+    spyOn($, 'ajax').andCallThrough();
+    levels.eventListeners.click({
+      target: 'target'
+    });
+    expect($.ajax.callCount).toBe(1);
   });
 
   it('plays level', function() {
