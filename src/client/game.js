@@ -150,17 +150,33 @@ function setStatus(state, text) {
 
 function checkComplete(state) {
   if (state.gameBoard.complete()) {
+    state.complete = true;
     setStatus(state, 'COMPLETE!');
+    state.window.$.ajax({
+      url: '/levels/' + state.level.id + '/verify',
+      data: JSON.stringify({
+        solution: state.moves
+      }),
+      contentType: 'application/json; charset=utf-8',
+      type: 'POST',
+      success: function(result) {
+        if (result.valid) {
+          setStatus(state, 'VERIFIED!');
+        } else {
+          setStatus(state, 'NOT VERIFIED!');
+        }
+      }
+    });
   }
 }
 
 function slideObject(state, container, event, left) {
   event.preventDefault();
-
+  if (state.complete) {
+    return;
+  }
   var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
   var y = Math.floor((event.pageY - container.offsetTop) / HEIGHT);
-  // console.log('      createClick(' + x + ', ' + y + ', ' + left + '),');
-
   state.moves.push({
     x: x,
     y: y,
@@ -176,6 +192,7 @@ function slideObject(state, container, event, left) {
 function resetLevel(state) {
   state.gameBoard = core.createGameBoard(state.level.layout);
   state.moves = [];
+  state.complete = false;
   drawGameBoard(state);
   updateButtons(state);
   setStatus(state, '');

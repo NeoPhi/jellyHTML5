@@ -1,3 +1,4 @@
+var debug = require('debug')('server');
 var express = require('express');
 var path = require('path');
 var mongoose = require('mongoose');
@@ -45,4 +46,9 @@ app.get('/', function(req, res){
 });
 
 var port = process.env.PORT;
-app.listen(port);
+app.listen(port, function(err) {
+  if (err) {
+    throw err;
+  }
+  debug('Listening on port %d', port);
+});

@@ -43,7 +43,7 @@ describe('client/game', function() {
     spyOn(status, 'appendChild').andCallThrough();
     game.doIt(window);
     clicks.forEach(injectClick);
-    expect(status.appendChild.callCount).toBe(2);
+    expect(status.appendChild.callCount).toBe(3);
   }
 
   beforeEach(function() {
@@ -150,6 +150,11 @@ describe('client/game', function() {
     $.ajax = function(options) {
       if (options.url === '/levels/') {
         return options.success(levelsList);
+      }
+      if (options.url.indexOf('/verify') !== -1) {
+        return options.success({
+          valid: true
+        });
       }
       options.success(level);
     };

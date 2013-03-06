@@ -117,7 +117,7 @@ describe('server/lib/levels', function() {
     it('handles verification error', function() {
       var error = new Error();
       var level = new Level({
-        layout: 'LAYOUT'
+        layout: JSON.stringify('LAYOUT')
       });
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
         callback(undefined, level);
@@ -137,7 +137,7 @@ describe('server/lib/levels', function() {
 
     it('verifies level', function() {
       var level = new Level({
-        layout: 'LAYOUT'
+        layout: JSON.stringify('LAYOUT')
       });
       spyOn(Level, 'findById').andCallFake(function(id, callback) {
         callback(undefined, level);

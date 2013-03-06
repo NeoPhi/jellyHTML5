@@ -33,8 +33,12 @@ function returnLevel(req, res, next) {
 
 function verifyLevel(req, res, next) {
   var id = req.params.id;
+  var solution = req.body.solution;
+  if (!solution || (solution.length === 0)) {
+    return next(new Error('No solution'));
+  }
   loadLevel(id, next, function(level) {
-    verifier.check(level.layout, req.body.solution, function(err, result) {
+    verifier.check(JSON.parse(level.layout), solution, function(err, result) {
       if (err) {
         return next(err);
       }
