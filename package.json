@@ -23,5 +23,9 @@
     "test": "istanbul test jasmine-node -- test",
     "posttest": "browserify src/wrapper/wrapper.js -o build/js/jelly.js",
     "start": "node src/server/server.js"
+  },
+  "engines": {
+    "node": "0.8.21",
+    "npm":  "1.2.12"
   }
 }

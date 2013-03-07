@@ -9,7 +9,7 @@ mongoose.connect(process.env.MONGODB_URL);
 
 var app = express();
 
-app.use(express.favicon());
+app.use(express.favicon('static/favicon.ico'));
 app.use(express.logger('dev'));
 app.use(express.cookieParser());
 app.use(express.bodyParser());
@@ -26,7 +26,9 @@ app.set('view options', {
   layout: false
 });
 
-app.use(express['static']('build'));
+app.configure('development', function(){
+  app.use(express['static']('build'));
+});
 app.use(express['static']('static'));
 
 sessions.addRoutes(app);
