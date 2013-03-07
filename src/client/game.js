@@ -173,7 +173,7 @@ function checkComplete(state) {
 
 function slideObject(state, container, event, left) {
   event.preventDefault();
-  if (state.complete) {
+  if (!state.level || state.complete) {
     return;
   }
   var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
@@ -238,6 +238,8 @@ function loadLevels(state) {
       });
       if (state.window.location.hash) {
         loadLevel(state, state.window.location.hash.substring(1));
+      } else if (levels.length > 0) {
+        loadLevel(state, levels[0].id);
       }
     }
   });

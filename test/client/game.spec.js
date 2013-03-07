@@ -213,6 +213,22 @@ describe('client/game', function() {
     expect(reset.removeClass.callCount).toBe(0);
   });
 
+  it('ignores click if no level is loaded', function() {
+    delete window.location.hash;
+    game.doIt(window);
+    injectClick(createClick(2, 2, false));
+    // this would throw errors if the code didn't check for it
+  });
+
+  it('defaults to first loaded level', function() {
+    delete window.location.hash;
+    levelsList = [level];
+    spyOn($, 'ajax').andCallThrough();
+    game.doIt(window);
+    expect($.ajax.callCount).toBe(2);
+    expect($.ajax.argsForCall[1][0].url).toBe('/levels/' + level.id);
+  });
+
   it('loads levels and handles click', function() {
     delete window.location.hash;
     levelsList = [level];
