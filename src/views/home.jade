@@ -43,17 +43,21 @@ html
       div.row-fluid
         div.span9
           div.hero-unit
+            div#canvasContext.alert.alert-error.hide
+              p
+                strong Error!
+                |  Unable to render game...
             canvas#board(width="560", height="400")
-              p Your browser doesn't support canvas.
+              div.alert.alert-error
+                p
+                  strong Error!
+                  |  Your browser doesn't support canvas...
             br
             div.btn-group
               button#reset.btn.btn-primary.disabled Reset  
 
         div.span3
-          div.well.sidebar-nav
-            div#status
-            br
-            div#levels.scroll
+          div#levels.sidebar-nav.scroll.well
 
       div.row-fluid
         div.span12
@@ -75,13 +79,27 @@ html
       a(href="http://danielr.neophi.com/") Daniel Rinehart
       |  under an MIT License.
 
-    script(id="clicksTemplate",type="text/template").
-      <p>Completed in <%= level.status.clicks %> clicks.<p>
+    div#levelComplete.modal.hide.fade
+      div.modal-header
+          button.close(data-dismiss='modal') ×
+          h3 Congratulations!
+        div.modal-body
+          p Great job completing the level!
+        div.modal-footer
+          button.btn(data-dismiss='modal') Close
+
     script(id="levelTemplate",type="text/template").
-      <div>
-        <p><b><%- level.name %></b></p>
-        <button class="btn btn-small <%= buttonStatus %>" data-level="<%= level.id %>">Play</button>
-        <%= clicksMessage %>
+      <div class="well well-small">
+        <p>
+          <b><%- level.name %></b>
+        </p>
+        <p>
+          Current best solution: <%= level.clicks %><br/>
+          Your best solution: <%= clicksMessage %>
+        </p>
+        <p class="text-right">
+          <button class="btn btn-small <%= buttonStatus %>" data-level="<%= level.id %>">Play</button>
+        </p>
       </div>
 
     script(src="/js/jquery-1.9.1#{jsExt}")

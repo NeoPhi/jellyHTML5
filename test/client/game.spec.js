@@ -2,7 +2,6 @@ describe('client/game', function() {
   var game = require('../../src/client/game');
   var jQuery = require('../mock/jQuery');
 
-  var document;
   var window;
   var $;
   var _;
@@ -12,9 +11,8 @@ describe('client/game', function() {
   var levelsList;
   var level;
   var reset;
-  var status;
+  var levelComplete;
   var objects;
-  var clicksTemplate;
   var levelTemplate;
 
   function createClick(x, y, left) {
@@ -43,10 +41,10 @@ describe('client/game', function() {
   }
 
   function playLevel(clicks) {
-    spyOn(status, 'appendChild').andCallThrough();
+    spyOn(levelComplete, 'modal').andCallThrough();
     game.doIt(window);
     clicks.forEach(injectClick);
-    expect(status.appendChild.callCount).toBe(3);
+    expect(levelComplete.modal.callCount).toBe(1);
   }
 
   beforeEach(function() {
@@ -64,8 +62,10 @@ describe('client/game', function() {
     };
 
     board = new jQuery.Node();
-    board.getContext = function() {
-      return context;
+    board[0] = {
+      getContext: function() {
+        return context;
+      }
     };
 
     levels = new jQuery.Node();
@@ -88,33 +88,8 @@ describe('client/game', function() {
     levelsList = [];
 
     reset = new jQuery.Node();
+    levelComplete = new jQuery.Node();
 
-    status = {
-      appendChild: function() {}
-    };
-
-    document = {
-      getElementById: function(id) {
-        return {
-          board: board,
-          levels: levels,
-          reset: reset,
-          status: status
-        }[id];
-      },
-      createTextNode: function(text) {
-        return {
-          text: text
-        };
-      },
-      createElement: function(type) {
-        return {
-          type: type
-        };
-      }
-    };
-
-    clicksTemplate = new jQuery.Node();
     levelTemplate = new jQuery.Node();
 
     _ = {
@@ -129,7 +104,7 @@ describe('client/game', function() {
     $.addSelector('#board', board);
     $.addSelector('#levels', levels);
     $.addSelector('#reset', reset);
-    $.addSelector('#clicksTemplate', clicksTemplate);
+    $.addSelector('#levelComplete', levelComplete);
     $.addSelector('#levelTemplate', levelTemplate);
 
     $.ajax = function(options) {
@@ -145,7 +120,6 @@ describe('client/game', function() {
     };
 
     window = {
-      document: document,
       location: {
         hash: '12345'
       },

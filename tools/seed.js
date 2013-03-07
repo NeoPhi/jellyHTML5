@@ -875,21 +875,29 @@ var levels = [
 function createLevels(user, callback) {
   var author = user.id.toString();
   levels.forEach(function(level, index) {
+    var clicks = level.solution.length;
     level.author = author;
     level.name = 'Level ' + (index + 1);
     level.layout = JSON.stringify(level.layout);
     level.solution = JSON.stringify(level.solution);
+    level.clicks = clicks;
   });
   async.forEachSeries(levels, function(levelData, asyncCallback) {
     Level.findOne({
       author: author,
       name: levelData.name
     }, function(err, level) {
-      // TODO Check data is correct?
-      if (err || level) {
+      if (err) {
         return asyncCallback(err);
       }
-      level = new Level(levelData);
+      if (!level) {
+        level = new Level();
+      }
+      for (var key in levelData) {
+        if (levelData.hasOwnProperty(key)) {
+          level[key] = levelData[key];
+        }
+      }
       level.save(asyncCallback);
     });
   }, callback);

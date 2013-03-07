@@ -7,6 +7,10 @@ Node.prototype.html = function() {
   return this;
 };
 
+Node.prototype.text = function() {
+  return this;
+};
+
 Node.prototype.on = function(name, listener) {
   this.eventListeners[name] = listener;
   return this;
@@ -24,6 +28,10 @@ Node.prototype.removeClass = function(className) {
 
 Node.prototype.hasClass = function(className) {
   return this.classes.hasOwnProperty(className);
+};
+
+Node.prototype.modal = function() {
+  return this;
 };
 
 function create() {

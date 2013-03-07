@@ -140,18 +140,23 @@ function updateButtons(state) {
   }
 }
 
-function setStatus(state, text) {
-  var status = state.document.getElementById('status');
-  while (status.firstChild) {
-    status.removeChild(status.firstChild);
+function renderLevel(state, level) {
+  var data = {
+    level: level,
+    clicksMessage: '&#8734;',
+    buttonStatus: ''
+  };
+  if (level.status && (level.status.clicks > 0)) {
+    data.clicksMessage = level.status.clicks;
+  } else {
+    data.buttonStatus = 'btn-success';
   }
-  status.appendChild(state.document.createTextNode(text));
+  return state.templates.level(data);
 }
 
 function checkComplete(state) {
   if (state.gameBoard.complete()) {
     state.complete = true;
-    setStatus(state, 'COMPLETE!');
     state.window.$.ajax({
       url: '/levels/' + state.level.id + '/verify',
       data: JSON.stringify({
@@ -162,10 +167,9 @@ function checkComplete(state) {
       success: function(result) {
         // TODO Update client side HTML to reflect change
         if (result.valid) {
-          setStatus(state, 'VERIFIED!');
-        } else {
-          setStatus(state, 'NOT VERIFIED!');
+          state.window.$('#levelComplete').modal('show');
         }
+        // else: This should never happen, what to do?
       }
     });
   }
@@ -196,7 +200,6 @@ function resetLevel(state) {
   state.complete = false;
   drawGameBoard(state);
   updateButtons(state);
-  setStatus(state, '');
 }
 
 function loadLevel(state, id) {
@@ -211,26 +214,12 @@ function loadLevel(state, id) {
 }
 
 function loadLevels(state) {
-  var clicksTemplate = state.window._.template(state.window.$('#clicksTemplate').html());
-  var levelTemplate = state.window._.template(state.window.$('#levelTemplate').html());
   state.window.$.ajax({
     url: '/levels/',
     success: function(levels) {
       state.window.$('#levels').html(function() {
-        // TODO Use client side templating engine
-        // possibly something with bindings as this can change
         return levels.map(function(level) {
-          var data = {
-            level: level
-          };
-          if (level.status && (level.status.clicks > 0)) {
-            data.clicksMessage = clicksTemplate(data);
-            data.buttonStatus = '';
-          } else {
-            data.clicksMessage = '';
-            data.buttonStatus = 'btn-success';
-          }
-          return levelTemplate(data);
+          return renderLevel(state, level);
         }).join('');
       }).on('click', function(event) {
         var id = state.window.$(event.target).data('level');
@@ -250,11 +239,13 @@ function loadLevels(state) {
 function doIt(window) {
   var state = {
     window: window,
-    document: window.document
+    templates: {
+      level: window._.template(window.$('#levelTemplate').html())
+    }
   };
-  var drawingCanvas = state.document.getElementById('board');
-  if (drawingCanvas.getContext) {
-    state.context = drawingCanvas.getContext('2d');
+  var drawingCanvas = state.window.$('#board');
+  if (drawingCanvas[0] && drawingCanvas[0].getContext) {
+    state.context = drawingCanvas[0].getContext('2d');
     loadLevels(state);
 
     window.$('#board').on('click', function(event) {
@@ -263,6 +254,7 @@ function doIt(window) {
       slideObject(state, this, event, false);
     });
 
+    // TODO add undo/redo support
     window.$('#reset').on('click', function(event) {
       if (window.$(event.target).hasClass('disabled')) {
         return;
@@ -270,7 +262,7 @@ function doIt(window) {
       resetLevel(state);
     });
   } else {
-    setStatus(state, 'Unable to get drawing context');
+    window.$('#canvasContext').removeClass('hide');
   }
 }
 

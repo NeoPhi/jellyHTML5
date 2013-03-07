@@ -17,13 +17,18 @@ var LevelSchema = mongoose.Schema({
   solution: {
     type: String,
     required: true
+  },
+  clicks: {
+    type: Number,
+    required: true
   }
 });
 
 function toClient(summary, status) {
   var result = {
     id: this.id.toString(),
-    name: this.name
+    name: this.name,
+    clicks: this.clicks
   };
   if (!summary) {
     result.layout = JSON.parse(this.layout);
