@@ -12,11 +12,13 @@ var LevelSchema = mongoose.Schema({
   },
   layout: {
     type: String,
-    required: true
+    required: true,
+    select: false
   },
   solution: {
     type: String,
-    required: true
+    required: true,
+    select: false
   },
   clicks: {
     type: Number,

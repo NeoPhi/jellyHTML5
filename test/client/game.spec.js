@@ -71,6 +71,7 @@ describe('client/game', function() {
     levels = new jQuery.Node();
 
     level = {
+      id: '123',
       layout: [
         'x x x x x x x x x x x x x x ',
         'x grl0        grl2glx     x ',
@@ -103,18 +104,15 @@ describe('client/game', function() {
     $ = jQuery.create();
     $.addSelector('#board', board);
     $.addSelector('#levels', levels);
+    $.addSelector('#level' + level.id, new jQuery.Node());
     $.addSelector('#reset', reset);
     $.addSelector('#levelComplete', levelComplete);
     $.addSelector('#levelTemplate', levelTemplate);
+    $.addSelector('#clickCount', new jQuery.Node());
 
     $.ajax = function(options) {
       if (options.url === '/levels/') {
         return options.success(levelsList);
-      }
-      if (options.url.indexOf('/verify') !== -1) {
-        return options.success({
-          valid: true
-        });
       }
       options.success(level);
     };

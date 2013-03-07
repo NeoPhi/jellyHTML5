@@ -84,8 +84,8 @@ describe('server/lib/levels', function() {
   describe('GET /levels/:id', function() {
     it('handles error loading level', function() {
       var error = new Error();
-      spyOn(Level, 'findById').andCallFake(function(id, callback) {
-        callback(error);
+      spyOn(Level, 'findById').andCallFake(function() {
+        arguments[arguments.length - 1](error);
       });
       spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
         callback();
@@ -99,8 +99,8 @@ describe('server/lib/levels', function() {
     });
 
     it('handles no level', function() {
-      spyOn(Level, 'findById').andCallFake(function(id, callback) {
-        callback();
+      spyOn(Level, 'findById').andCallFake(function() {
+        arguments[arguments.length - 1]();
       });
       spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
         callback();
@@ -115,8 +115,8 @@ describe('server/lib/levels', function() {
     it('returns level', function() {
       var level = new Level();
       spyOn(level, 'toClient').andReturn('LEVEL');
-      spyOn(Level, 'findById').andCallFake(function(id, callback) {
-        callback(undefined, level);
+      spyOn(Level, 'findById').andCallFake(function() {
+        arguments[arguments.length - 1](undefined, level);
       });
       spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
         callback();
@@ -139,8 +139,8 @@ describe('server/lib/levels', function() {
       var level = new Level({
         layout: JSON.stringify('LAYOUT')
       });
-      spyOn(Level, 'findById').andCallFake(function(id, callback) {
-        callback(undefined, level);
+      spyOn(Level, 'findById').andCallFake(function() {
+        arguments[arguments.length - 1](undefined, level);
       });
       spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
         callback();
@@ -162,14 +162,17 @@ describe('server/lib/levels', function() {
       var level = new Level({
         layout: JSON.stringify('LAYOUT')
       });
-      spyOn(Level, 'findById').andCallFake(function(id, callback) {
-        callback(undefined, level);
+      spyOn(level, 'toClient').andReturn('TO CLIENT');
+      spyOn(Level, 'findById').andCallFake(function() {
+        arguments[arguments.length - 1](undefined, level);
       });
       spyOn(Status, 'findByUserAndLevelId').andCallFake(function(user, levelId, callback) {
         callback();
       });
       spyOn(verifier, 'check').andCallFake(function(layout, solution, callback) {
-        callback(undefined, 'CHECKED');
+        callback(undefined, {
+          valid: true
+        });
       });
       req.params.id = '123';
       req.body.solution = 'SOLUTION';
@@ -178,7 +181,7 @@ describe('server/lib/levels', function() {
       expect(verifier.check.argsForCall[0][0]).toBe('LAYOUT');
       expect(verifier.check.argsForCall[0][1]).toBe('SOLUTION');
       expect(res.send.callCount).toBe(1);
-      expect(res.send.argsForCall[0][0]).toBe('CHECKED');
+      expect(res.send.argsForCall[0][0]).toBe('TO CLIENT');
     });
   });
 });

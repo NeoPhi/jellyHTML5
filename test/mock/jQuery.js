@@ -7,6 +7,10 @@ Node.prototype.html = function() {
   return this;
 };
 
+Node.prototype.replaceWith = function() {
+  return this;
+};
+
 Node.prototype.text = function() {
   return this;
 };

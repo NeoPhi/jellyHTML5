@@ -131,13 +131,15 @@ function drawGameBoard(state) {
   });
 }
 
-function updateButtons(state) {
+function updateStatus(state) {
   var reset = state.window.$('#reset');
-  if (state.moves.length === 0) {
+  var clickCount = state.clicks.length;
+  if (clickCount === 0) {
     reset.addClass('disabled');
   } else {
     reset.removeClass('disabled');
   }
+  state.window.$('#clickCount').text(clickCount);
 }
 
 function renderLevel(state, level) {
@@ -148,6 +150,9 @@ function renderLevel(state, level) {
   };
   if (level.status && (level.status.clicks > 0)) {
     data.clicksMessage = level.status.clicks;
+    if (level.status.clicks > level.clicks) {
+      data.buttonStatus = 'btn-info';
+    }
   } else {
     data.buttonStatus = 'btn-success';
   }
@@ -157,19 +162,19 @@ function renderLevel(state, level) {
 function checkComplete(state) {
   if (state.gameBoard.complete()) {
     state.complete = true;
+    // TODO add error handler
     state.window.$.ajax({
       url: '/levels/' + state.level.id + '/verify',
       data: JSON.stringify({
-        solution: state.moves
+        solution: state.clicks
       }),
       contentType: 'application/json; charset=utf-8',
       type: 'POST',
-      success: function(result) {
-        // TODO Update client side HTML to reflect change
-        if (result.valid) {
-          state.window.$('#levelComplete').modal('show');
-        }
-        // else: This should never happen, what to do?
+      success: function(level) {
+        state.window.$('#levelComplete').modal('show');
+        state.window.$('#level' + level.id).replaceWith(renderLevel(state, level));
+        // Update local state with new data from server
+        state.level = level;
       }
     });
   }
@@ -182,27 +187,28 @@ function slideObject(state, container, event, left) {
   }
   var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
   var y = Math.floor((event.pageY - container.offsetTop) / HEIGHT);
-  state.moves.push({
-    x: x,
-    y: y,
-    left: left
-  });
   if (state.gameBoard.click(x, y, left)) {
+    state.clicks.push({
+      x: x,
+      y: y,
+      left: left
+    });
     drawGameBoard(state);
-    updateButtons(state);
+    updateStatus(state);
     checkComplete(state);
   }
 }
 
 function resetLevel(state) {
   state.gameBoard = core.createGameBoard(state.level.layout);
-  state.moves = [];
+  state.clicks = [];
   state.complete = false;
   drawGameBoard(state);
-  updateButtons(state);
+  updateStatus(state);
 }
 
 function loadLevel(state, id) {
+  // TODO add error handler
   state.window.$.ajax({
     url: '/levels/' + id,
     success: function(level) {
@@ -214,6 +220,7 @@ function loadLevel(state, id) {
 }
 
 function loadLevels(state) {
+  // TODO add error handler
   state.window.$.ajax({
     url: '/levels/',
     success: function(levels) {

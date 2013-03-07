@@ -7,7 +7,7 @@ var async = require('async');
 function loadLevel(user, id, callback) {
   async.parallel({
     level: function(asyncCallback) {
-      Level.findById(id, asyncCallback);
+      Level.findById(id, '+layout', asyncCallback);
     },
     status: function(asyncCallback) {
       Status.findByUserAndLevelId(user, id, asyncCallback);
@@ -61,19 +61,35 @@ function verifyLevel(req, res, next) {
   var id = req.params.id;
   var solution = req.body.solution;
   if (!solution || (solution.length === 0)) {
-    return next(new Error('No solution provided'));
+    return next(new Error('No solution provided for level: ' + id));
   }
   loadLevel(req.user, id, function(err, results) {
     if (err) {
       return next(err);
     }
-    verifier.check(JSON.parse(results.level.layout), solution, function(err, result) {
+
+    var level = results.level;
+
+    verifier.check(JSON.parse(level.layout), solution, function(err, result) {
       if (err) {
         return next(err);
       }
-      if (!req.user) {
-        return res.send(result);
+      if (!result.valid) {
+        return next(new Error('Solution not valid for level: ' + id));
       }
+      // TODO wait for saves? okay if they fail?
+
+      // TODO Convert to findAndModify
+      if (result.clicks < level.clicks) {
+        level.solution = JSON.stringify(solution);
+        level.clicks = result.clicks;
+        level.save();
+      }
+
+      if (!req.user) {
+        return res.send(level.toClient(false));
+      }
+
       var status = results.status;
       if (!status) {
         status = new Status({
@@ -81,15 +97,14 @@ function verifyLevel(req, res, next) {
           level: id
         });
       }
+      // TODO Convert to findAndModify
       if (!status.clicks || (result.clicks < status.clicks)) {
         status.clicks = result.clicks;
+        status.save();
       }
-      status.save(function(err) {
-        if (err) {
-          return next(err);
-        }
-        res.send(result);
-      });
+
+      res.send(level.toClient(false, status));
+
     });
   });
 }

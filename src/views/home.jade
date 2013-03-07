@@ -10,7 +10,7 @@ html
         padding-bottom: 40px;
       }
       .scroll {
-        height: 400px;
+        height: 500px;
         overflow: auto;
       }
     link(href="/css/bootstrap-responsive-2.3.0#{cssExt}", rel="stylesheet", media="screen")
@@ -47,6 +47,10 @@ html
               p
                 strong Error!
                 |  Unable to render game...
+            p.pull-right
+              | Click count 
+              span#clickCount 0
+
             canvas#board(width="560", height="400")
               div.alert.alert-error
                 p
@@ -54,7 +58,7 @@ html
                   |  Your browser doesn't support canvas...
             br
             div.btn-group
-              button#reset.btn.btn-primary.disabled Reset  
+              button#reset.btn.btn-primary.disabled Reset
 
         div.span3
           div#levels.sidebar-nav.scroll.well
@@ -89,7 +93,7 @@ html
           button.btn(data-dismiss='modal') Close
 
     script(id="levelTemplate",type="text/template").
-      <div class="well well-small">
+      <div id="level<%= level.id %>" class="well well-small">
         <p>
           <b><%- level.name %></b>
         </p>
