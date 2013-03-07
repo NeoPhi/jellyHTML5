@@ -1,10 +1,11 @@
 describe('client/game', function() {
   var game = require('../../src/client/game');
+  var jQuery = require('../mock/jQuery');
 
   var document;
   var window;
   var $;
-  var $lookup;
+  var _;
   var board;
   var context;
   var levels;
@@ -13,6 +14,8 @@ describe('client/game', function() {
   var reset;
   var status;
   var objects;
+  var clicksTemplate;
+  var levelTemplate;
 
   function createClick(x, y, left) {
     var method = 'click';
@@ -60,30 +63,12 @@ describe('client/game', function() {
       fillRect: function() {}
     };
 
-    board = {
-      eventListeners: {},
-      getContext: function() {
-        return context;
-      },
-      addEventListener: function(name, fn) {
-        board.eventListeners[name] = fn;
-      },
-      on: function(name, fn) {
-        board.eventListeners[name] = fn;
-        return board;
-      }
+    board = new jQuery.Node();
+    board.getContext = function() {
+      return context;
     };
 
-    levels = {
-      eventListeners: {},
-      html: function() {
-        return levels;
-      },
-      on: function(name, fn) {
-        levels.eventListeners[name] = fn;
-        return levels;
-      }
-    };
+    levels = new jQuery.Node();
 
     level = {
       layout: [
@@ -102,17 +87,7 @@ describe('client/game', function() {
 
     levelsList = [];
 
-    reset = {
-      eventListeners: {},
-      addEventListener: function() {},
-      addClass: jasmine.createSpy(),
-      hasClass: jasmine.createSpy(),
-      removeClass: jasmine.createSpy(),
-      on: function(name, fn) {
-        reset.eventListeners[name] = fn;
-        return reset;
-      }
-    };
+    reset = new jQuery.Node();
 
     status = {
       appendChild: function() {}
@@ -139,14 +114,24 @@ describe('client/game', function() {
       }
     };
 
-    $lookup = {
-      '#board': board,
-      '#levels': levels,
-      '#reset': reset
+    clicksTemplate = new jQuery.Node();
+    levelTemplate = new jQuery.Node();
+
+    _ = {
+      template: function(html) {
+        return function() {
+          return html;
+        };
+      }
     };
-    $ = function(name) {
-      return $lookup[name];
-    };
+
+    $ = jQuery.create();
+    $.addSelector('#board', board);
+    $.addSelector('#levels', levels);
+    $.addSelector('#reset', reset);
+    $.addSelector('#clicksTemplate', clicksTemplate);
+    $.addSelector('#levelTemplate', levelTemplate);
+
     $.ajax = function(options) {
       if (options.url === '/levels/') {
         return options.success(levelsList);
@@ -164,7 +149,8 @@ describe('client/game', function() {
       location: {
         hash: '12345'
       },
-      $: $
+      $: $,
+      _: _
     };
   });
 
@@ -177,6 +163,9 @@ describe('client/game', function() {
   });
 
   it('resets level', function() {
+    spyOn(reset, 'hasClass').andCallThrough();
+    spyOn(reset, 'addClass').andCallThrough();
+    spyOn(reset, 'removeClass').andCallThrough();
     game.doIt(window);
     expect(reset.hasClass.callCount).toBe(0);
     expect(reset.addClass.callCount).toBe(1);
@@ -198,7 +187,10 @@ describe('client/game', function() {
   });
 
   it('ignores reset', function() {
-    reset.hasClass.andReturn(true);
+    reset.addClass('disabled');
+    spyOn(reset, 'hasClass').andCallThrough();
+    spyOn(reset, 'addClass').andCallThrough();
+    spyOn(reset, 'removeClass').andCallThrough();
     game.doIt(window);
     expect(reset.hasClass.callCount).toBe(0);
     expect(reset.addClass.callCount).toBe(1);
@@ -233,6 +225,7 @@ describe('client/game', function() {
     delete window.location.hash;
     levelsList = [level];
     spyOn(levels, 'html').andCallThrough();
+    spyOn(levelTemplate, 'html').andReturn('LEVEL');
     game.doIt(window);
     expect(levels.html.callCount).toBe(1);
     var html = levels.html.argsForCall[0][0]();
@@ -242,7 +235,7 @@ describe('client/game', function() {
         return 'ID';
       }
     };
-    $lookup.target = target;
+    $.addSelector('target', target);
     spyOn($, 'ajax').andCallThrough();
     levels.eventListeners.click({
       target: 'target'

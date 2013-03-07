@@ -53,8 +53,7 @@ html
           div.well.sidebar-nav
             div#status
             br
-            div.scroll
-              ul#levels
+            div#levels.scroll
 
       div.row-fluid
         div.span12
@@ -76,8 +75,18 @@ html
       a(href="http://danielr.neophi.com/") Daniel Rinehart
       |  under an MIT License.
 
+    script(id="clicksTemplate",type="text/template").
+      <p>Completed in <%= level.status.clicks %> clicks.<p>
+    script(id="levelTemplate",type="text/template").
+      <div>
+        <p><b><%- level.name %></b></p>
+        <button class="btn btn-small <%= buttonStatus %>" data-level="<%= level.id %>">Play</button>
+        <%= clicksMessage %>
+      </div>
+
     script(src="/js/jquery-1.9.1#{jsExt}")
     script(src="/js/bootstrap-2.3.0#{jsExt}")
+    script(src="/js/underscore-1.4.4#{jsExt}")
     script(src="/js/jelly.js")
 
     <!-- dailycred -->

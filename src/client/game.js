@@ -211,6 +211,8 @@ function loadLevel(state, id) {
 }
 
 function loadLevels(state) {
+  var clicksTemplate = state.window._.template(state.window.$('#clicksTemplate').html());
+  var levelTemplate = state.window._.template(state.window.$('#levelTemplate').html());
   state.window.$.ajax({
     url: '/levels/',
     success: function(levels) {
@@ -218,17 +220,17 @@ function loadLevels(state) {
         // TODO Use client side templating engine
         // possibly something with bindings as this can change
         return levels.map(function(level) {
-          var html = [
-            '<li>',
-            '<button class="btn" data-level="' + level.id + '">' + level.name + '</button>'
-          ];
-          html.push('</li>');
-          if (level.status) {
-            if (level.status.clicks > 0) {
-              html.push(' Current best: ' + level.status.clicks);
-            }
+          var data = {
+            level: level
+          };
+          if (level.status && (level.status.clicks > 0)) {
+            data.clicksMessage = clicksTemplate(data);
+            data.buttonStatus = '';
+          } else {
+            data.clicksMessage = '';
+            data.buttonStatus = 'btn-success';
           }
-          return html.join('');
+          return levelTemplate(data);
         }).join('');
       }).on('click', function(event) {
         var id = state.window.$(event.target).data('level');
