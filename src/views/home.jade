@@ -48,8 +48,8 @@ html
                 strong Error!
                 |  Unable to render game...
             p.pull-right
-              | Click count 
-              span#clickCount 0
+              | Move count 
+              span#moveCount 0
 
             canvas#board(width="560", height="400")
               div.alert.alert-error
@@ -71,7 +71,7 @@ html
             li.
               Goal: Merge all jellies of the same color.
             li.
-              Controls: Left and right mouse clicks move jellies.
+              Controls: Left and right swipes or mouse clicks move jellies.
             li.
               Note: Purple jellies don't merge, they are just there to help.
             li.
@@ -88,7 +88,13 @@ html
           button.close(data-dismiss='modal') ×
           h3 Congratulations!
         div.modal-body
-          p Great job completing the level!
+          p Great job completing the level! 
+            if !user
+              a(href="/auth/signup") Sign Up
+              |  or 
+              a(href="/auth/signin") Sign In
+              |  to track progress.
+
         div.modal-footer
           button.btn(data-dismiss='modal') Close
 
@@ -98,8 +104,8 @@ html
           <b><%- level.name %></b>
         </p>
         <p>
-          Current best solution: <%= level.clicks %><br/>
-          Your best solution: <%= clicksMessage %>
+          Current best solution: <%= level.moves %><br/>
+          Your best solution: <%= movesMessage %>
         </p>
         <p class="text-right">
           <button class="btn btn-small <%= buttonStatus %>" data-level="<%= level.id %>">Play</button>
@@ -107,6 +113,7 @@ html
       </div>
 
     script(src="/js/jquery-1.9.1#{jsExt}")
+    script(src="/js/jquery.touchSwipe-1.6.0#{jsExt}")
     script(src="/js/bootstrap-2.3.0#{jsExt}")
     script(src="/js/underscore-1.4.4#{jsExt}")
     script(src="/js/jelly.js")

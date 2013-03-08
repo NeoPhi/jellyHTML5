@@ -80,9 +80,9 @@ function verifyLevel(req, res, next) {
       // TODO wait for saves? okay if they fail?
 
       // TODO Convert to findAndModify
-      if (result.clicks < level.clicks) {
+      if (result.moves < level.moves) {
         level.solution = JSON.stringify(solution);
-        level.clicks = result.clicks;
+        level.moves = result.moves;
         level.save();
       }
 
@@ -98,8 +98,8 @@ function verifyLevel(req, res, next) {
         });
       }
       // TODO Convert to findAndModify
-      if (!status.clicks || (result.clicks < status.clicks)) {
-        status.clicks = result.clicks;
+      if (!status.moves || (result.moves < status.moves)) {
+        status.moves = result.moves;
         status.save();
       }
 

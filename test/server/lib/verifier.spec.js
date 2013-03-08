@@ -8,7 +8,7 @@ describe('server/lib/verifier', function() {
   beforeEach(function() {
     done = false;
     gameBoard = {
-      click: jasmine.createSpy(),
+      move: jasmine.createSpy(),
       complete: jasmine.createSpy()
     };
     spyOn(core, 'createGameBoard').andReturn(gameBoard);
@@ -29,18 +29,18 @@ describe('server/lib/verifier', function() {
         }
         expect(core.createGameBoard.callCount).toBe(1);
         expect(core.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
-        expect(gameBoard.click.callCount).toBe(0);
+        expect(gameBoard.move.callCount).toBe(0);
         expect(gameBoard.complete.callCount).toBe(1);
         expect(result).toEqual({
           valid: false,
-          clicks: 0
+          moves: 0
         });
         done = true;
       });
     });
 
     it('handles multiple step solution', function() {
-      gameBoard.click.andReturn(true);
+      gameBoard.move.andReturn(true);
       gameBoard.complete.andReturn(true);
       verifier.check('LAYOUT', [{
         x: 1,
@@ -56,17 +56,17 @@ describe('server/lib/verifier', function() {
         }
         expect(core.createGameBoard.callCount).toBe(1);
         expect(core.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
-        expect(gameBoard.click.callCount).toBe(2);
-        expect(gameBoard.click.argsForCall[0][0]).toBe(1);
-        expect(gameBoard.click.argsForCall[0][1]).toBe(1);
-        expect(gameBoard.click.argsForCall[0][2]).toBe(false);
-        expect(gameBoard.click.argsForCall[1][0]).toBe(2);
-        expect(gameBoard.click.argsForCall[1][1]).toBe(1);
-        expect(gameBoard.click.argsForCall[1][2]).toBe(true);
+        expect(gameBoard.move.callCount).toBe(2);
+        expect(gameBoard.move.argsForCall[0][0]).toBe(1);
+        expect(gameBoard.move.argsForCall[0][1]).toBe(1);
+        expect(gameBoard.move.argsForCall[0][2]).toBe(false);
+        expect(gameBoard.move.argsForCall[1][0]).toBe(2);
+        expect(gameBoard.move.argsForCall[1][1]).toBe(1);
+        expect(gameBoard.move.argsForCall[1][2]).toBe(true);
         expect(gameBoard.complete.callCount).toBe(1);
         expect(result).toEqual({
           valid: true,
-          clicks: 2
+          moves: 2
         });
         done = true;
       });

@@ -20,7 +20,7 @@ var LevelSchema = mongoose.Schema({
     required: true,
     select: false
   },
-  clicks: {
+  moves: {
     type: Number,
     required: true
   }
@@ -30,7 +30,7 @@ function toClient(summary, status) {
   var result = {
     id: this.id.toString(),
     name: this.name,
-    clicks: this.clicks
+    moves: this.moves
   };
   if (!summary) {
     result.layout = JSON.parse(this.layout);

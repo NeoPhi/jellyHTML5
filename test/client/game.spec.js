@@ -15,7 +15,7 @@ describe('client/game', function() {
   var objects;
   var levelTemplate;
 
-  function createClick(x, y, left) {
+  function createMove(x, y, left) {
     var method = 'click';
     if (!left) {
       method = 'contextmenu';
@@ -27,23 +27,23 @@ describe('client/game', function() {
     };
   }
 
-  function injectClick(click) {
+  function injectMove(move) {
     var event = {
-      pageX: click.x * 40 + 20,
-      pageY: click.y * 40 + 20,
+      pageX: move.x * 40 + 20,
+      pageY: move.y * 40 + 20,
       preventDefault: function() {}
     };
     var that = {
       offsetLeft: 0,
       offsetTop: 0
     };
-    board.eventListeners[click.method].call(that, event);
+    board.eventListeners[move.method].call(that, event);
   }
 
-  function playLevel(clicks) {
+  function playLevel(moves) {
     spyOn(levelComplete, 'modal').andCallThrough();
     game.doIt(window);
-    clicks.forEach(injectClick);
+    moves.forEach(injectMove);
     expect(levelComplete.modal.callCount).toBe(1);
   }
 
@@ -108,7 +108,7 @@ describe('client/game', function() {
     $.addSelector('#reset', reset);
     $.addSelector('#levelComplete', levelComplete);
     $.addSelector('#levelTemplate', levelTemplate);
-    $.addSelector('#clickCount', new jQuery.Node());
+    $.addSelector('#moveCount', new jQuery.Node());
 
     $.ajax = function(options) {
       if (options.url === '/levels/') {
@@ -143,7 +143,7 @@ describe('client/game', function() {
     expect(reset.addClass.callCount).toBe(1);
     expect(reset.addClass.argsForCall[0][0]).toBe('disabled');
     expect(reset.removeClass.callCount).toBe(0);
-    injectClick(createClick(2, 2, false));
+    injectMove(createMove(2, 2, false));
     expect(reset.hasClass.callCount).toBe(0);
     expect(reset.addClass.callCount).toBe(1);
     expect(reset.removeClass.callCount).toBe(1);
@@ -177,10 +177,10 @@ describe('client/game', function() {
     expect(reset.removeClass.callCount).toBe(0);
   });
 
-  it('ignores click if no level is loaded', function() {
+  it('ignores move if no level is loaded', function() {
     delete window.location.hash;
     game.doIt(window);
-    injectClick(createClick(2, 2, false));
+    injectMove(createMove(2, 2, false));
     // this would throw errors if the code didn't check for it
   });
 
@@ -193,7 +193,7 @@ describe('client/game', function() {
     expect($.ajax.argsForCall[1][0].url).toBe('/levels/' + level.id);
   });
 
-  it('loads levels and handles click', function() {
+  it('loads levels and handles move', function() {
     delete window.location.hash;
     levelsList = [level];
     spyOn(levels, 'html').andCallThrough();
@@ -216,38 +216,38 @@ describe('client/game', function() {
   });
 
   it('plays level', function() {
-    var clicks = [
-      createClick(2, 2, false),
-      createClick(3, 2, false),
-      createClick(8, 2, true),
-      createClick(8, 3, true),
-      createClick(3, 3, false),
-      createClick(6, 3, true),
-      createClick(7, 3, false),
-      createClick(3, 3, true),
-      createClick(5, 6, false),
-      createClick(8, 3, true),
-      createClick(7, 3, true),
-      createClick(6, 5, true),
-      createClick(2, 2, false),
-      createClick(3, 2, false),
-      createClick(3, 3, false),
-      createClick(4, 3, false),
-      createClick(4, 3, false),
-      createClick(4, 3, false),
-      createClick(5, 3, false),
-      createClick(6, 3, false),
-      createClick(7, 3, false),
-      createClick(8, 4, false),
-      createClick(9, 4, false),
-      createClick(10, 4, false),
-      createClick(11, 4, false),
-      createClick(11, 8, true),
-      createClick(11, 8, true),
-      createClick(10, 8, true),
-      createClick(9, 8, true),
-      createClick(8, 8, true)
+    var moves = [
+      createMove(2, 2, false),
+      createMove(3, 2, false),
+      createMove(8, 2, true),
+      createMove(8, 3, true),
+      createMove(3, 3, false),
+      createMove(6, 3, true),
+      createMove(7, 3, false),
+      createMove(3, 3, true),
+      createMove(5, 6, false),
+      createMove(8, 3, true),
+      createMove(7, 3, true),
+      createMove(6, 5, true),
+      createMove(2, 2, false),
+      createMove(3, 2, false),
+      createMove(3, 3, false),
+      createMove(4, 3, false),
+      createMove(4, 3, false),
+      createMove(4, 3, false),
+      createMove(5, 3, false),
+      createMove(6, 3, false),
+      createMove(7, 3, false),
+      createMove(8, 4, false),
+      createMove(9, 4, false),
+      createMove(10, 4, false),
+      createMove(11, 4, false),
+      createMove(11, 8, true),
+      createMove(11, 8, true),
+      createMove(10, 8, true),
+      createMove(9, 8, true),
+      createMove(8, 8, true)
     ];
-    playLevel(clicks);
+    playLevel(moves);
   });
 });

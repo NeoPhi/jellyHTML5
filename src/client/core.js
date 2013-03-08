@@ -276,7 +276,7 @@ function createGameBoard(layout) {
   }
 
   // TODO: Optimize
-  function click(x, y, left) {
+  function move(x, y, left) {
     var dx = 1;
     if (left) {
       dx = -1;
@@ -386,7 +386,7 @@ function createGameBoard(layout) {
 
   return {
     addObject: addObject,
-    click: click,
+    move: move,
     postSetup: postSetup,
     getObjects: getObjects,
     complete: complete

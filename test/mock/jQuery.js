@@ -20,6 +20,10 @@ Node.prototype.on = function(name, listener) {
   return this;
 };
 
+Node.prototype.swipe = function() {
+  return this;
+};
+
 Node.prototype.addClass = function(className) {
   this.classes[className] = true;
   return this;

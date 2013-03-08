@@ -13,7 +13,7 @@ var StatusSchema = mongoose.Schema({
   rating: {
     type: Number
   },
-  clicks: {
+  moves: {
     type: Number
   }
 });
@@ -26,7 +26,7 @@ StatusSchema.index({
 function toClient() {
   return {
     rating: this.rating,
-    clicks: this.clicks
+    moves: this.moves
   };
 }
 

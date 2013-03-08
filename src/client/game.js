@@ -133,24 +133,24 @@ function drawGameBoard(state) {
 
 function updateStatus(state) {
   var reset = state.window.$('#reset');
-  var clickCount = state.clicks.length;
-  if (clickCount === 0) {
+  var moveCount = state.moves.length;
+  if (moveCount === 0) {
     reset.addClass('disabled');
   } else {
     reset.removeClass('disabled');
   }
-  state.window.$('#clickCount').text(clickCount);
+  state.window.$('#moveCount').text(moveCount);
 }
 
 function renderLevel(state, level) {
   var data = {
     level: level,
-    clicksMessage: '&#8734;',
+    movesMessage: '&#8734;',
     buttonStatus: ''
   };
-  if (level.status && (level.status.clicks > 0)) {
-    data.clicksMessage = level.status.clicks;
-    if (level.status.clicks > level.clicks) {
+  if (level.status && (level.status.moves > 0)) {
+    data.movesMessage = level.status.moves;
+    if (level.status.moves > level.moves) {
       data.buttonStatus = 'btn-info';
     }
   } else {
@@ -166,7 +166,7 @@ function checkComplete(state) {
     state.window.$.ajax({
       url: '/levels/' + state.level.id + '/verify',
       data: JSON.stringify({
-        solution: state.clicks
+        solution: state.moves
       }),
       contentType: 'application/json; charset=utf-8',
       type: 'POST',
@@ -180,19 +180,12 @@ function checkComplete(state) {
   }
 }
 
-function slideObject(state, container, event, left) {
-  event.preventDefault();
+function slideObject(state, move) {
   if (!state.level || state.complete) {
     return;
   }
-  var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
-  var y = Math.floor((event.pageY - container.offsetTop) / HEIGHT);
-  if (state.gameBoard.click(x, y, left)) {
-    state.clicks.push({
-      x: x,
-      y: y,
-      left: left
-    });
+  if (state.gameBoard.move(move.x, move.y, move.left)) {
+    state.moves.push(move);
     drawGameBoard(state);
     updateStatus(state);
     checkComplete(state);
@@ -201,7 +194,7 @@ function slideObject(state, container, event, left) {
 
 function resetLevel(state) {
   state.gameBoard = core.createGameBoard(state.level.layout);
-  state.clicks = [];
+  state.moves = [];
   state.complete = false;
   drawGameBoard(state);
   updateStatus(state);
@@ -243,6 +236,33 @@ function loadLevels(state) {
   });
 }
 
+function translateClick(container, event, left) {
+  event.preventDefault();
+  var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
+  var y = Math.floor((event.pageY - container.offsetTop) / HEIGHT);
+  return {
+    x: x,
+    y: y,
+    left: left
+  };
+}
+
+function translateSwipe(container, event, distance, left) {
+  event.preventDefault();
+  var delta = -distance;
+  if (left) {
+    delta *= -1;
+  }
+  var source = event.changedTouches[0];
+  var x = Math.floor((source.pageX + delta - container.offsetLeft) / WIDTH);
+  var y = Math.floor((source.pageY - container.offsetTop) / HEIGHT);
+  return {
+    x: x,
+    y: y,
+    left: left
+  };
+}
+
 function doIt(window) {
   var state = {
     window: window,
@@ -255,10 +275,28 @@ function doIt(window) {
     state.context = drawingCanvas[0].getContext('2d');
     loadLevels(state);
 
-    window.$('#board').on('click', function(event) {
-      slideObject(state, this, event, true);
+    var ignoreClick = false;
+    window.$('#board').on('mousedown', function() {
+      ignoreClick = false;
+    }).on('click', function(event) {
+      if (!ignoreClick) {
+        slideObject(state, translateClick(this, event, true));
+      }
     }).on('contextmenu', function(event) {
-      slideObject(state, this, event, false);
+      if (!ignoreClick) {
+        slideObject(state, translateClick(this, event, false));
+      }
+    }).swipe({
+      swipe: function(event, direction, distance) {
+        // TODO Does event.preventDefault() work here?
+        ignoreClick = true;
+        if ((direction === 'left') || (direction === 'right')) {
+          if (event.changedTouches && (event.changedTouches.length > 0)) {
+            slideObject(state, translateSwipe(this[0], event, distance, (direction === 'left')));
+          }
+        }
+      },
+      threshold: WIDTH / 2
     });
 
     // TODO add undo/redo support
