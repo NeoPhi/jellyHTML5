@@ -200,7 +200,9 @@ describe('shared/game', function() {
       '  r ',
       'xrx '
     ]);
+    expect(gameBoard.solved()).toBe(false);
     expect(gameBoard.move(1, 0, true)).toBe(true);
+    expect(gameBoard.solved()).toBe(true);
     verifyObjects([
       createJelly([0, 0], [0, -1]),
       createWall([0, 1]),
@@ -215,6 +217,7 @@ describe('shared/game', function() {
       'xrx '
     ]);
     expect(gameBoard.move(1, 1, true)).toBe(true);
+    expect(gameBoard.solved()).toBe(false);
     verifyObjects([
       createWall([0, 0]),
       createJelly([0, 1]),

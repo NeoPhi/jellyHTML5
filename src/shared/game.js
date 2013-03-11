@@ -315,6 +315,8 @@ function createGameBoard(layout) {
             if (object.spawnFixed) {
               newJelly.attach(object);
             }
+            // A spawner goes away once spawned
+            delete object.spawnColor;
           }
         }
       });
@@ -378,6 +380,9 @@ function createGameBoard(layout) {
   function solved() {
     var colors = {};
     return getObjects().every(function(object) {
+      if (object.spawnColor) {
+        return false;
+      }
       if (!object.mergable()) {
         return true;
       }

@@ -9,6 +9,7 @@ var email = 'tatsunami.qrostar@gmail.com';
 
 /*
 , {
+    name: 'Level ',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -23,6 +24,7 @@ var email = 'tatsunami.qrostar@gmail.com';
     ],
     solution: [
     ]
+  }
 */
 
 function createMove(x, y, left) {
@@ -35,6 +37,7 @@ function createMove(x, y, left) {
 
 var levels = [
   {
+    name: 'Level 1',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -64,6 +67,7 @@ var levels = [
       createMove(3, 5, true)
     ]
   }, {
+    name: 'Level 2',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -91,6 +95,7 @@ var levels = [
       createMove(6, 4, true)
     ]
   }, {
+    name: 'Level 3',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -126,6 +131,7 @@ var levels = [
       createMove(4, 5, true)
     ]
   }, {
+    name: 'Level 4',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -185,6 +191,7 @@ var levels = [
       createMove(4, 6, true)
     ]
   }, {
+    name: 'Level 5',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -230,6 +237,7 @@ var levels = [
       createMove(7, 5, true)
     ]
   }, {
+    name: 'Level 6',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x             x ',
@@ -271,6 +279,7 @@ var levels = [
       createMove(4, 7, true)
     ]
   }, {
+    name: 'Level 7',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -302,6 +311,7 @@ var levels = [
       createMove(7, 6, true)
     ]
   }, {
+    name: 'Level 8',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x   x     x   x x x x ',
@@ -357,6 +367,7 @@ var levels = [
       createMove(7, 6, false)
     ]
   }, {
+    name: 'Level 9',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -396,6 +407,7 @@ var levels = [
       createMove(5, 7, true)
     ]
   }, {
+    name: 'Level 10',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x       g r               x ',
@@ -441,6 +453,7 @@ var levels = [
       createMove(10, 6, false)
     ]
   }, {
+    name: 'Level 11',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x             yrl0l0yl  y x ',
@@ -481,6 +494,7 @@ var levels = [
       createMove(9, 5, false)
     ]
   }, {
+    name: 'Level 12',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x r   r r     r r   r x x ',
@@ -524,6 +538,7 @@ var levels = [
       createMove(10, 4, false)
     ]
   }, {
+    name: 'Level 13',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x x x x x x x x ',
@@ -544,6 +559,7 @@ var levels = [
       createMove(6, 4, true)
     ]
   }, {
+    name: 'Level 14',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x x x       r x ',
@@ -617,6 +633,7 @@ var levels = [
       createMove(7, 7, true)
     ]
   }, {
+    name: 'Level 15',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x r   r   r             r x ',
@@ -667,6 +684,7 @@ var levels = [
       createMove(8, 5, true)
     ]
   }, {
+    name: 'Level 16',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x       l0l0l0l1l2l3l3r x ',
@@ -701,6 +719,7 @@ var levels = [
       createMove(3, 5, true)
     ]
   }, {
+    name: 'Level 17',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x l0l0l0x x x g b   x ',
@@ -752,6 +771,7 @@ var levels = [
       createMove(10, 8, false)
     ]
   }, {
+    name: 'Level 18',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -805,6 +825,7 @@ var levels = [
       createMove(10, 3, false)
     ]
   }, {
+    name: 'Level 19',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x grl0        grl2glx     x ',
@@ -850,6 +871,7 @@ var levels = [
       createMove(8, 8, true)
     ]
   }, {
+    name: 'Level 20',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x r r r r       r g g x x x ',
@@ -894,6 +916,7 @@ var levels = [
       createMove(11, 4, false)
     ]
   }, {
+    name: 'Level 21',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x             x           x ',
@@ -909,6 +932,7 @@ var levels = [
     solution: [
     ]
   }, {
+    name: 'Level 22',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -924,6 +948,7 @@ var levels = [
     solution: [
     ]
   }, {
+    name: 'Level 23',
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -938,15 +963,46 @@ var levels = [
     ],
     solution: [
     ]
+  }, {
+    name: 'Level 24',
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x g       b           x x x ',
+      'x r       g           x x x ',
+      'x yb      b   y       y x x ',
+      'x x       x   x       x x x ',
+      'x x x x               x x x ',
+      'x x x x               x x x ',
+      'x x x x xgx   x x xRx x x x ',
+      'x x x x x x gbx x x x x x x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
+  }, {
+    name: 'Level 25',
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x x x x x x x x     x     x ',
+      'x x x x x x x x     rt    x ',
+      'x x x x x x x x           x ',
+      'x x x x x           r     x ',
+      'x x l0l0l0        l1l1l1  x ',
+      'x   l0l0l0        l1l1l1  x ',
+      'x   g                 x   x ',
+      'x x x x xgx x xgx x xgx x x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
   }
 ];
 
 function createLevels(user, callback) {
   var author = user.id.toString();
-  levels.forEach(function(level, index) {
+  levels.forEach(function(level) {
     var moves = level.solution.length;
     level.author = author;
-    level.name = 'Level ' + (index + 1);
     level.layout = JSON.stringify(level.layout);
     level.solution = JSON.stringify(level.solution);
     level.moves = moves;
