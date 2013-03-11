@@ -1,6 +1,6 @@
 describe('server/lib/verifier', function() {
   var verifier = require('../../../src/server/lib/verifier');
-  var core = require('../../../src/client/core');
+  var game = require('../../../src/shared/game');
 
   var done;
   var gameBoard;
@@ -11,7 +11,7 @@ describe('server/lib/verifier', function() {
       move: jasmine.createSpy(),
       complete: jasmine.createSpy()
     };
-    spyOn(core, 'createGameBoard').andReturn(gameBoard);
+    spyOn(game, 'createGameBoard').andReturn(gameBoard);
   });
 
   afterEach(function() {
@@ -27,8 +27,8 @@ describe('server/lib/verifier', function() {
         if (err) {
           throw err;
         }
-        expect(core.createGameBoard.callCount).toBe(1);
-        expect(core.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
+        expect(game.createGameBoard.callCount).toBe(1);
+        expect(game.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
         expect(gameBoard.move.callCount).toBe(0);
         expect(gameBoard.complete.callCount).toBe(1);
         expect(result).toEqual({
@@ -54,8 +54,8 @@ describe('server/lib/verifier', function() {
         if (err) {
           throw err;
         }
-        expect(core.createGameBoard.callCount).toBe(1);
-        expect(core.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
+        expect(game.createGameBoard.callCount).toBe(1);
+        expect(game.createGameBoard.argsForCall[0][0]).toBe('LAYOUT');
         expect(gameBoard.move.callCount).toBe(2);
         expect(gameBoard.move.argsForCall[0][0]).toBe(1);
         expect(gameBoard.move.argsForCall[0][1]).toBe(1);

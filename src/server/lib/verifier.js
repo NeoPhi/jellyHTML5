@@ -1,7 +1,7 @@
-var core = require('../../client/core');
+var game = require('../../shared/game');
 
 function check(layout, solution, callback) {
-  var gameBoard = core.createGameBoard(layout);
+  var gameBoard = game.createGameBoard(layout);
   var index = 0;
   var moves = 0;
 

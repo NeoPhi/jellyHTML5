@@ -1,4 +1,2 @@
-var game = require('../client/game');
-
-game.doIt(window);
-
+var canvas = require('../client/canvas');
+canvas.render(window);

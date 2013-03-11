@@ -1,4 +1,4 @@
-var core = require('./core');
+var game = require('../shared/game');
 
 var WIDTH = 40;
 var HEIGHT = 40;
@@ -193,7 +193,7 @@ function slideObject(state, move) {
 }
 
 function resetLevel(state) {
-  state.gameBoard = core.createGameBoard(state.level.layout);
+  state.gameBoard = game.createGameBoard(state.level.layout);
   state.moves = [];
   state.complete = false;
   drawGameBoard(state);
@@ -263,7 +263,7 @@ function translateSwipe(container, event, distance, left) {
   };
 }
 
-function doIt(window) {
+function render(window) {
   var state = {
     window: window,
     templates: {
@@ -311,4 +311,4 @@ function doIt(window) {
   }
 }
 
-module.exports.doIt = doIt;
+module.exports.render = render;

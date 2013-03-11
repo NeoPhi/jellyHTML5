@@ -1,5 +1,5 @@
-describe('client/game', function() {
-  var game = require('../../src/client/game');
+describe('client/canvas', function() {
+  var canvas = require('../../src/client/canvas');
   var jQuery = require('../mock/jQuery');
 
   var window;
@@ -42,7 +42,7 @@ describe('client/game', function() {
 
   function playLevel(moves) {
     spyOn(levelComplete, 'modal').andCallThrough();
-    game.doIt(window);
+    canvas.render(window);
     moves.forEach(injectMove);
     expect(levelComplete.modal.callCount).toBe(1);
   }
@@ -126,9 +126,9 @@ describe('client/game', function() {
     };
   });
 
-  it('creates game board', function() {
+  it('renders game board', function() {
     spyOn(levels, 'html').andCallThrough();
-    game.doIt(window);
+    canvas.render(window);
     expect(levels.html.callCount).toBe(1);
     var html = levels.html.argsForCall[0][0]();
     expect(html).toBe('');
@@ -138,7 +138,7 @@ describe('client/game', function() {
     spyOn(reset, 'hasClass').andCallThrough();
     spyOn(reset, 'addClass').andCallThrough();
     spyOn(reset, 'removeClass').andCallThrough();
-    game.doIt(window);
+    canvas.render(window);
     expect(reset.hasClass.callCount).toBe(0);
     expect(reset.addClass.callCount).toBe(1);
     expect(reset.addClass.argsForCall[0][0]).toBe('disabled');
@@ -163,7 +163,7 @@ describe('client/game', function() {
     spyOn(reset, 'hasClass').andCallThrough();
     spyOn(reset, 'addClass').andCallThrough();
     spyOn(reset, 'removeClass').andCallThrough();
-    game.doIt(window);
+    canvas.render(window);
     expect(reset.hasClass.callCount).toBe(0);
     expect(reset.addClass.callCount).toBe(1);
     expect(reset.addClass.argsForCall[0][0]).toBe('disabled');
@@ -179,7 +179,7 @@ describe('client/game', function() {
 
   it('ignores move if no level is loaded', function() {
     delete window.location.hash;
-    game.doIt(window);
+    canvas.render(window);
     injectMove(createMove(2, 2, false));
     // this would throw errors if the code didn't check for it
   });
@@ -188,7 +188,7 @@ describe('client/game', function() {
     delete window.location.hash;
     levelsList = [level];
     spyOn($, 'ajax').andCallThrough();
-    game.doIt(window);
+    canvas.render(window);
     expect($.ajax.callCount).toBe(2);
     expect($.ajax.argsForCall[1][0].url).toBe('/levels/' + level.id);
   });
@@ -198,7 +198,7 @@ describe('client/game', function() {
     levelsList = [level];
     spyOn(levels, 'html').andCallThrough();
     spyOn(levelTemplate, 'html').andReturn('LEVEL');
-    game.doIt(window);
+    canvas.render(window);
     expect(levels.html.callCount).toBe(1);
     var html = levels.html.argsForCall[0][0]();
     expect(html).not.toBe('');

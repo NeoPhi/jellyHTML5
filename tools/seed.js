@@ -893,6 +893,9 @@ function createLevels(user, callback) {
       if (!level) {
         level = new Level();
       }
+      if ((level.moves > 0) && (level.moves < levelData.moves)) {
+        return process.nextTick(asyncCallback);
+      }
       for (var key in levelData) {
         if (levelData.hasOwnProperty(key)) {
           level[key] = levelData[key];
