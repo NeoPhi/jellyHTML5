@@ -1,3 +1,6 @@
+var WALL = 'wall';
+var JELLY = 'jelly';
+
 // TODO Rework API, tie everything to game board instead of having
 // separate objects and instead expose create/update methods on
 // game board directly
@@ -102,6 +105,7 @@ function createJelly(x, y, color) {
   }
 
   jelly = {
+    type: JELLY,
     coordinates: [],
     attachments: [],
     affected: affected,
@@ -140,6 +144,7 @@ function createWall(x, y) {
   }
 
   return {
+    type: WALL,
     movable: movable,
     collides: collides,
     mergable: mergable,
@@ -308,7 +313,7 @@ function createGameBoard(layout) {
     return objects;
   }
 
-  function complete() {
+  function solved() {
     var colors = {};
     return getObjects().every(function(object) {
       if (!object.mergable()) {
@@ -380,20 +385,15 @@ function createGameBoard(layout) {
     postSetup();
   }
 
-  if (layout) {
-    construct(layout);
-  }
+  construct(layout);
 
   return {
-    addObject: addObject,
     move: move,
-    postSetup: postSetup,
     getObjects: getObjects,
-    complete: complete
+    solved: solved
   };
 }
 
 module.exports.createGameBoard = createGameBoard;
-module.exports.createJelly = createJelly;
-module.exports.createWall = createWall;
-
+module.exports.WALL = WALL;
+module.exports.JELLY = JELLY;

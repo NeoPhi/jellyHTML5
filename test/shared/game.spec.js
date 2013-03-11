@@ -1,316 +1,214 @@
 describe('shared/game', function() {
   var game = require('../../src/shared/game');
 
-  var jelly;
-  var wall;
-  var gameBoard;
-
-  function matches(expected, actual) {
-    if (expected.length !== actual.length) {
-      return false;
+  function byCoordinates(a, b) {
+    if (a.x === b.x) {
+      return a.y - b.y;
     }
-    var lookup = {};
-    actual.forEach(function(coordinates) {
-      lookup[coordinates.x + ':' + coordinates.y] = true;
-    });
-    var hits = 0;
-    expected.forEach(function(coordinates) {
-      if (lookup[coordinates.x + ':' + coordinates.y]) {
-        hits += 1;
-      }
-    });
-    expect(actual.length).toBe(hits);
+    return a.x - b.x;
   }
 
-  beforeEach(function() {
-    jelly = game.createJelly(1, 1, 'r');
-    gameBoard = game.createGameBoard();
-    for (var i = -1; i <= 3; i += 1) {
-      gameBoard.addObject(game.createWall(i, 2));
+  function createKey(object) {
+    var key = object.type + ' ';
+    object.coordinates.sort(byCoordinates);
+    key += object.coordinates.map(function(coordinates) {
+      return '(' + coordinates.x + ', ' + coordinates.y + ')';
+    }).join(', ');
+    return key;
+  }
+
+  function verifyObjects(expected, actual) {
+    expect(actual.length).toBe(expected.length);
+    var lookup = {};
+    expected.forEach(function(object) {
+      lookup[createKey(object)] = true;
+    });
+    var notFound = [];
+    actual.forEach(function(object) {
+      var key = createKey(object);
+      if (lookup.hasOwnProperty(key)) {
+        delete lookup[key];
+      } else {
+        notFound.push(key);
+      }
+    });
+    var leftOver = [];
+    for (var key in lookup) {
+      if (lookup.hasOwnProperty(key)) {
+        leftOver.push(key);
+      }
     }
-    gameBoard.addObject(jelly);
+    expect(notFound).toEqual(leftOver);
+  }
+
+  function createCoordinates() {
+    return [].slice.call(arguments).map(function(coordinates) {
+      return {
+        x: coordinates[0],
+        y: coordinates[1]
+      };
+    });
+  }
+
+  function createWall() {
+    return {
+      type: game.WALL,
+      coordinates: createCoordinates.apply(undefined, arguments)
+    };
+  }
+
+  function createJelly() {
+    return {
+      type: game.JELLY,
+      coordinates: createCoordinates.apply(undefined, arguments)
+    };
+  }
+
+  it('ignores a move not on an object', function() {
+    var gameBoard = game.createGameBoard([
+      'x '
+    ]);
+    expect(gameBoard.move(10, 10, false)).toBe(false);
   });
 
-  describe('construct', function() {
-    it('creates level', function() {
-      gameBoard = game.createGameBoard([
-        'x x x x x x x x x x x x x x ',
-        'x grl0        grl2glx     x ',
-        'x   l1gl        l2  x     x ',
-        'x l3l3l3        l4  x     x ',
-        'x gt  gt      g gtg       x ',
-        'x x x           x x x     x ',
-        'x x x           x x x     x ',
-        'x x x           x x x     x ',
-        'x x x                     x ',
-        'x x x x x x x x x x x x x x '
-      ]);
-      expect(gameBoard.getObjects().length).toBe(76);
-    });
+  it('ignores a move on a wall', function() {
+    var gameBoard = game.createGameBoard([
+      'x '
+    ]);
+    expect(gameBoard.move(0, 0, false)).toBe(false);
   });
 
-  describe('move', function() {
-    beforeEach(function() {
-      wall = game.createWall(0, 1);
-    });
+  it('can move a jelly', function() {
+    var gameBoard = game.createGameBoard([
+      '  r ',
+      'x x '
+    ]);
+    expect(gameBoard.move(1, 0, true)).toBe(true);
+    verifyObjects([
+      createJelly([0, 0]),
+      createWall([0, 1]),
+      createWall([1, 1])
+    ], gameBoard.getObjects());
+  });
 
-    it('ignores a move not on an object', function() {
-      expect(gameBoard.move(10, 10, false)).toBe(false);
-    });
+  it('merges after move', function() {
+    var gameBoard = game.createGameBoard([
+      'r   r ',
+      'x x x '
+    ]);
+    expect(gameBoard.move(2, 0, true)).toBe(true);
+    verifyObjects([
+      createJelly([0, 0], [1, 0]),
+      createWall([0, 1]),
+      createWall([1, 1]),
+      createWall([2, 1])
+    ], gameBoard.getObjects());
+  });
 
-    it('ignores a move on a wall', function() {
-      expect(gameBoard.move(0, 2, false)).toBe(false);
-    });
+  it('merges two after move', function() {
+    var gameBoard = game.createGameBoard([
+      '    r ',
+      '    x ',
+      'r   r ',
+      'x x x '
+    ]);
+    expect(gameBoard.move(2, 0, true)).toBe(true);
+    verifyObjects([
+      createWall([2, 1]),
+      createJelly([0, 2], [1, 2], [2, 2]),
+      createWall([0, 3]),
+      createWall([1, 3]),
+      createWall([2, 3])
+    ], gameBoard.getObjects());
+  });
 
-    it('can move a jelly on an empty board', function() {
-      expect(gameBoard.move(1, 1, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }], jelly.coordinates);
-    });
+  it('does not move anchored jelly attached to jelly', function() {
+    var gameBoard = game.createGameBoard([
+      'bb  ',
+      'r x ',
+      'x x '
+    ]);
+    expect(gameBoard.move(0, 0, false)).toBe(false);
+    verifyObjects([
+      createJelly([0, 0]),
+      createJelly([0, 1]),
+      createWall([1, 1]),
+      createWall([0, 2]),
+      createWall([1, 2])
+    ], gameBoard.getObjects());
+  });
 
-    it('merges after move', function() {
-      var jelly2 = game.createJelly(3, 1, 'r');
-      gameBoard.addObject(jelly2);
+  it('moves series of anchored jellies', function() {
+    var gameBoard = game.createGameBoard([
+      'rrb gl',
+      '  x   '
+    ]);
+    expect(gameBoard.move(0, 0, false)).toBe(true);
+    verifyObjects([
+      createJelly([1, 0]),
+      createJelly([2, 0]),
+      createJelly([3, 0]),
+      createWall([1, 1])
+    ], gameBoard.getObjects());
+  });
 
-      var originalCount = gameBoard.getObjects().length;
-      expect(gameBoard.move(3, 1, true)).toBe(true);
-      matches([{
-        x: 1,
-        y: 1
-      }, {
-        x: 2,
-        y: 1
-      }], jelly.coordinates);
-      expect(gameBoard.getObjects().length).toBe(originalCount - 1);
-    });
+  it('does not move series of anchored jellies', function() {
+    var gameBoard = game.createGameBoard([
+      'rbb ',
+      'x x '
+    ]);
+    expect(gameBoard.move(1, 0, true)).toBe(false);
+    verifyObjects([
+      createJelly([0, 0]),
+      createJelly([1, 0]),
+      createWall([0, 1]),
+      createWall([1, 1])
+    ], gameBoard.getObjects());
+  });
 
-    it('merges two after move', function() {
-      var jelly2 = game.createJelly(3, 1, 'r');
-      gameBoard.addObject(jelly2);
+  it('does not move a jelly next to a wall', function() {
+    var gameBoard = game.createGameBoard([
+      'x r ',
+      'x x '
+    ]);
+    expect(gameBoard.move(1, 0, true)).toBe(false);
+    verifyObjects([
+      createWall([0, 0]),
+      createJelly([1, 0]),
+      createWall([0, 1]),
+      createWall([1, 1])
+    ], gameBoard.getObjects());
+  });
 
-      var jelly3 = game.createJelly(3, -1, 'r');
-      gameBoard.addObject(jelly3);
+  it('can move a jelly next to another jelly', function() {
+    var gameBoard = game.createGameBoard([
+      '  r b ',
+      'x x x '
+    ]);
+    expect(gameBoard.move(2, 0, true)).toBe(true);
+    verifyObjects([
+      createJelly([0, 0]),
+      createJelly([1, 0]),
+      createWall([0, 1]),
+      createWall([1, 1]),
+      createWall([2, 1])
+    ], gameBoard.getObjects());
+  });
 
-      var originalCount = gameBoard.getObjects().length;
-      expect(gameBoard.move(3, -1, true)).toBe(true);
-      matches([{
-        x: 1,
-        y: 1
-      }, {
-        x: 2,
-        y: 1
-      }, {
-        x: 3,
-        y: 1
-      }], jelly.coordinates);
-      expect(gameBoard.getObjects().length).toBe(originalCount - 2);
-    });
-
-    it('does not move anchored jelly attached to jelly', function() {
-      var jelly2 = game.createJelly(1, 0, 'b');
-      gameBoard.addObject(jelly2);
-      jelly2.attach(jelly, true);
-      gameBoard.addObject(wall);
-      expect(gameBoard.move(1, 0, true)).toBe(false);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 0
-      }], jelly2.coordinates);
-    });
-
-    it('supports funky jellies', function() {
-      jelly.addCoordinates(3, 1);
-      var jelly2 = game.createJelly(2, 1, 'b');
-      gameBoard.addObject(jelly2);
-      expect(gameBoard.move(2, 1, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }, {
-        x: 2,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('moves series of anchored jellies', function() {
-      var jelly2 = game.createJelly(2, 1, 'b');
-      jelly2.addCoordinates(3, 1);
-      gameBoard.addObject(jelly2);
-      jelly.attach(jelly2, true);
-
-      var jelly3 = game.createJelly(4, 1, 'g');
-      gameBoard.addObject(jelly3);
-      jelly3.attach(jelly2, true);
-
-      expect(gameBoard.move(2, 1, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 1
-      }, {
-        x: 2,
-        y: 1
-      }], jelly2.coordinates);
-      matches([{
-        x: 3,
-        y: 1
-      }], jelly3.coordinates);
-    });
-
-    it('does not move series of anchored jellies', function() {
-      var wall2  = game.createWall(1, 0);
-      gameBoard.addObject(wall2);
-      jelly.attach(wall2);
-
-      var jelly2 = game.createJelly(2, 1, 'b');
-      gameBoard.addObject(jelly2);
-
-      expect(gameBoard.move(2, 1, true)).toBe(false);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 2,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('moves anchored jelly attached to jelly', function() {
-      var jelly2 = game.createJelly(1, 0, 'b');
-      gameBoard.addObject(jelly2);
-      jelly2.attach(jelly, true);
-      expect(gameBoard.move(1, 0, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 0,
-        y: 0
-      }], jelly2.coordinates);
-    });
-
-    it('moves jelly anchored to jelly', function() {
-      var jelly2 = game.createJelly(1, 0, 'b');
-      gameBoard.addObject(jelly2);
-      jelly2.attach(jelly, true);
-      
-      expect(gameBoard.move(1, 1, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 0,
-        y: 0
-      }], jelly2.coordinates);
-    });
-
-    it('does not move a jelly next to a wall', function() {
-      gameBoard.addObject(wall);
-      expect(gameBoard.move(1, 1, true)).toBe(false);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-    });
-
-    it('can move a jelly next to another jelly', function() {
-      var jelly2 = game.createJelly(0, 1, 'b');
-      gameBoard.addObject(jelly2);
-      expect(gameBoard.move(1, 1, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: -1,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('follows the chain', function() {
-      var jelly2 = game.createJelly(2, 1, 'b');
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.move(2, 1, true)).toBe(false);
-    });
-
-    it('accounts for vertical position', function() {
-      var jelly2 = game.createJelly(2, 0, 'b');
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.move(2, 0, true)).toBe(true);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 0
-      }], jelly2.coordinates);
-    });
-
-    it('applies gravity after move', function() {
-      var jelly2 = game.createJelly(1, 0, 'b');
-      gameBoard.addObject(jelly2);
-      expect(gameBoard.move(1, 1, true)).toBe(true);
-      matches([{
-        x: 0,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('accounts for height', function() {
-      var jelly2 = game.createJelly(2, 0, 'b');
-      jelly2.addCoordinates(2, 1);
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.move(2, 0, true)).toBe(false);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 2,
-        y: 0
-      }, {
-        x: 2,
-        y: 1
-      }], jelly2.coordinates);
-    });
-
-    it('falls after moving', function() {
-      var jelly2 = game.createJelly(2, -1, 'b');
-      gameBoard.addObject(jelly2);
-      gameBoard.addObject(wall);
-      expect(gameBoard.move(2, -1, true)).toBe(true);
-      matches([{
-        x: 1,
-        y: 1
-      }], jelly.coordinates);
-      matches([{
-        x: 1,
-        y: 0
-      }], jelly2.coordinates);
-    });
+  it('creates complex level', function() {
+    var gameBoard = game.createGameBoard([
+      'x x x x x x x x x x x x x x ',
+      'x grl0        grl2glx     x ',
+      'x   l1gl        l2  x     x ',
+      'x l3l3l3        l4  x     x ',
+      'x gt  gt      g gtg       x ',
+      'x x x           x x x     x ',
+      'x x x           x x x     x ',
+      'x x x           x x x     x ',
+      'x x x                     x ',
+      'x x x x x x x x x x x x x x '
+    ]);
+    expect(gameBoard.getObjects().length).toBe(76);
+    expect(gameBoard.solved()).toBe(false);
   });
 });

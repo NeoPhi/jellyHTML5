@@ -1,6 +1,6 @@
 rm -f -r ../jellyDeploy/src/
 mkdir ../jellyDeploy/src/
-cp -R src/client ../jellyDeploy/src/
+cp -R src/shared ../jellyDeploy/src/
 cp -R src/server ../jellyDeploy/src/
 cp -R src/views ../jellyDeploy/src/
 

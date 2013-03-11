@@ -11,7 +11,7 @@ describe('client/canvas', function() {
   var levelsList;
   var level;
   var reset;
-  var levelComplete;
+  var levelSolved;
   var objects;
   var levelTemplate;
 
@@ -41,10 +41,10 @@ describe('client/canvas', function() {
   }
 
   function playLevel(moves) {
-    spyOn(levelComplete, 'modal').andCallThrough();
+    spyOn(levelSolved, 'modal').andCallThrough();
     canvas.render(window);
     moves.forEach(injectMove);
-    expect(levelComplete.modal.callCount).toBe(1);
+    expect(levelSolved.modal.callCount).toBe(1);
   }
 
   beforeEach(function() {
@@ -89,7 +89,7 @@ describe('client/canvas', function() {
     levelsList = [];
 
     reset = new jQuery.Node();
-    levelComplete = new jQuery.Node();
+    levelSolved = new jQuery.Node();
 
     levelTemplate = new jQuery.Node();
 
@@ -106,7 +106,7 @@ describe('client/canvas', function() {
     $.addSelector('#levels', levels);
     $.addSelector('#level' + level.id, new jQuery.Node());
     $.addSelector('#reset', reset);
-    $.addSelector('#levelComplete', levelComplete);
+    $.addSelector('#levelSolved', levelSolved);
     $.addSelector('#levelTemplate', levelTemplate);
     $.addSelector('#moveCount', new jQuery.Node());
 

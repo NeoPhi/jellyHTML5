@@ -159,9 +159,9 @@ function renderLevel(state, level) {
   return state.templates.level(data);
 }
 
-function checkComplete(state) {
-  if (state.gameBoard.complete()) {
-    state.complete = true;
+function checkSolved(state) {
+  if (state.gameBoard.solved()) {
+    state.solved = true;
     // TODO add error handler
     state.window.$.ajax({
       url: '/levels/' + state.level.id + '/verify',
@@ -171,7 +171,7 @@ function checkComplete(state) {
       contentType: 'application/json; charset=utf-8',
       type: 'POST',
       success: function(level) {
-        state.window.$('#levelComplete').modal('show');
+        state.window.$('#levelSolved').modal('show');
         state.window.$('#level' + level.id).replaceWith(renderLevel(state, level));
         // Update local state with new data from server
         state.level = level;
@@ -181,21 +181,21 @@ function checkComplete(state) {
 }
 
 function slideObject(state, move) {
-  if (!state.level || state.complete) {
+  if (!state.level || state.solved) {
     return;
   }
   if (state.gameBoard.move(move.x, move.y, move.left)) {
     state.moves.push(move);
     drawGameBoard(state);
     updateStatus(state);
-    checkComplete(state);
+    checkSolved(state);
   }
 }
 
 function resetLevel(state) {
   state.gameBoard = game.createGameBoard(state.level.layout);
   state.moves = [];
-  state.complete = false;
+  state.solved = false;
   drawGameBoard(state);
   updateStatus(state);
 }
