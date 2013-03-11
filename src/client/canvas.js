@@ -208,6 +208,7 @@ function resetLevel(state) {
   state.gameBoard = game.createGameBoard(state.level.layout);
   state.moves = [];
   state.solved = false;
+  state.window.$('#title').text(state.level.name);
   drawGameBoard(state);
   updateStatus(state);
 }

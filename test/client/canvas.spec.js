@@ -109,6 +109,7 @@ describe('client/canvas', function() {
     $.addSelector('#levelSolved', levelSolved);
     $.addSelector('#levelTemplate', levelTemplate);
     $.addSelector('#moveCount', new jQuery.Node());
+    $.addSelector('#title', new jQuery.Node());
 
     $.ajax = function(options) {
       if (options.url === '/levels/') {
