@@ -7,6 +7,24 @@ mongoose.connect(process.env.MONGODB_URL);
 
 var email = 'tatsunami.qrostar@gmail.com';
 
+/*
+, {
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
+*/
+
 function createMove(x, y, left) {
   return {
     x: x,
@@ -901,6 +919,21 @@ var levels = [
       'x   x   x x     x x x   x x ',
       'x b x                     x ',
       'x x x x x x xRx x x x x x x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
+  }, {
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x                         x ',
+      'x                         x ',
+      'x         g               x ',
+      'x         b               x ',
+      'x         x         r     x ',
+      'x                 x x     x ',
+      'x   b                     x ',
+      'x x x x   r   x xrx   x g x ',
       'x x x x x x x x x x x x x x '
     ],
     solution: [
