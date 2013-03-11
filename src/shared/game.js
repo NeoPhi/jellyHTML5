@@ -152,6 +152,18 @@ function createWall(x, y) {
   };
 }
 
+// Layout specification:
+// Array of strings of elements
+// Each element is two characters:
+// First is type:
+//   r,g,b,y are mergable jellies
+//   l is a unmergable jelly
+//   x is a wall
+//   space is an open space
+// Second is control:
+//   for r,g,b,y it is either blank or t,l,b,r to indicate fixed to direction
+//   for l it is the grouping code 0-9
+//   for x it is either blank or r,g,b,y to indicate spawn color (capatilize to spawn fixed)
 function createGameBoard(layout) {
   var objects = [];
 
@@ -298,7 +310,11 @@ function createGameBoard(layout) {
           if (objectsToMove.length > 0) {
             spawned = true;
             moveObjects(objectsToMove, 0, -1);
-            addObject(createJelly(coordinates.x, coordinates.y - 1, object.spawnColor));
+            var newJelly = createJelly(coordinates.x, coordinates.y - 1, object.spawnColor);
+            addObject(newJelly);
+            if (object.spawnFixed) {
+              newJelly.attach(object);
+            }
           }
         }
       });
@@ -418,7 +434,8 @@ function createGameBoard(layout) {
         continue;
       }
       if (object.type === WALL) {
-        object.spawnColor = control;
+        object.spawnColor = control.toLowerCase();
+        object.spawnFixed = (control !== object.spawnColor);
       } else {
         addAttachment(control, x, y, attachments);
       }

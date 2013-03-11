@@ -238,6 +238,22 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
+  it('spawns fixed object', function() {
+    var gameBoard = game.createGameBoard([
+      '  r g ',
+      'xRx x '
+    ]);
+    expect(gameBoard.move(2, 0, true)).toBe(true);
+    expect(gameBoard.move(0, 0, false)).toBe(false);
+    verifyObjects([
+      createJelly([0, 0], [0, -1]),
+      createJelly([1, 0]),
+      createWall([0, 1]),
+      createWall([1, 1]),
+      createWall([2, 1])
+    ], gameBoard.getObjects());
+  });
+
   it('creates complex level', function() {
     var gameBoard = game.createGameBoard([
       'x x x x x x x x x x x x x x ',

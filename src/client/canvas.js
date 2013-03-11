@@ -61,7 +61,7 @@ function drawAttachment(state, object) {
         x: x + 1,
         y: y
       }])) {
-        state.context.fillRect((x + MARGIN) * WIDTH - spacing, (y * HEIGHT) + (spacing * 3), spacing * 3, spacing * 2);
+        state.context.fillRect((x + 1) * WIDTH - spacing, (y * HEIGHT) + (spacing * 3), spacing * 3, spacing * 2);
       }
       if (attachment.collides([{
         x: x - 1,
@@ -73,7 +73,7 @@ function drawAttachment(state, object) {
         x: x,
         y: y + 1
       }])) {
-        state.context.fillRect((x * WIDTH) + (spacing * 3), ((y + MARGIN) * HEIGHT) - spacing, (spacing * 2), (spacing * 3));
+        state.context.fillRect((x * WIDTH) + (spacing * 3), ((y + 1) * HEIGHT) - spacing, (spacing * 2), (spacing * 3));
       }
       if (attachment.collides([{
         x: x,
@@ -95,7 +95,11 @@ function drawObject(object, lookup, doConnect, context) {
     roundedRect(context, (x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), HEIGHT - (MARGIN * 2), RADIUS);
     if (object.spawnColor) {
       setFillStyle(object.spawnColor, context);
-      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), RADIUS);
+      var spacing = RADIUS / 2;
+      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), spacing);
+      if (object.spawnFixed) {
+        context.fillRect((x * WIDTH) + (spacing * 3), (y * HEIGHT) + MARGIN, spacing * 2, spacing * 2);
+      }
     }
   });
   if (doConnect) {
@@ -149,6 +153,7 @@ function updateStatus(state) {
 function renderLevel(state, level) {
   var data = {
     level: level,
+    bestMessage: '&#8734;',
     movesMessage: '&#8734;',
     buttonStatus: ''
   };
@@ -159,6 +164,9 @@ function renderLevel(state, level) {
     }
   } else {
     data.buttonStatus = 'btn-success';
+  }
+  if (level.moves > 0) {
+    data.bestMessage = level.moves;
   }
   return state.templates.level(data);
 }

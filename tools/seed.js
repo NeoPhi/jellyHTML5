@@ -25,6 +25,8 @@ var levels = [
       'x             x x         x ',
       'x     g           r   b   x ',
       'x x b x x x g   x x x x x x ',
+      'x x x x x x x x x x x x x x ',
+      'x x x x x x x x x x x x x x ',
       'x x x x x x x x x x x x x x '
     ],
     solution: [
@@ -52,6 +54,8 @@ var levels = [
       'x           g       g     x ',
       'x       r   r       r     x ',
       'x x x x x   x   x   x x x x ',
+      'x x x x x x x x x x x x x x ',
+      'x x x x x x x x x x x x x x ',
       'x x x x x x x x x x x x x x '
     ],
     solution: [
@@ -77,6 +81,8 @@ var levels = [
       'x x x   x x x r x x x     x ',
       'x             b           x ',
       'x x x   x x x r x x x x x x ',
+      'x x x x x x x x x x x x x x ',
+      'x x x x x x x x x x x x x x ',
       'x x x x x x x x x x x x x x '
     ],
     solution: [
@@ -884,6 +890,21 @@ var levels = [
     ],
     solution: [
     ]
+  }, {
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x                         x ',
+      'x         g     b g r     x ',
+      'x   x   x x     x x x   x x ',
+      'x b x                     x ',
+      'x x x x x x xRx x x x x x x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
   }
 ];
 
@@ -906,10 +927,14 @@ function createLevels(user, callback) {
         return asyncCallback(err);
       }
       if (!level) {
-        level = new Level();
+        level = new Level({
+          moves: 0,
+          solution: JSON.stringify([])
+        });
       }
-      if ((level.moves > 0) && (level.moves < levelData.moves)) {
-        return process.nextTick(asyncCallback);
+      if ((levelData.moves === 0) || ((level.moves > 0) && (level.moves < levelData.moves))) {
+        delete levelData.solution;
+        delete levelData.moves;
       }
       for (var key in levelData) {
         if (levelData.hasOwnProperty(key)) {
