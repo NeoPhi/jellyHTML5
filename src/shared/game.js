@@ -202,7 +202,7 @@ function createGameBoard(layout) {
     });
   }
 
-  function gravityAll() {
+  function gravityAll(movedObjects) {
     var movableObjects = objects.filter(function(object) {
       return object.movable();
     });
@@ -211,6 +211,7 @@ function createGameBoard(layout) {
       do {
         objectsToMove = canMove(object, 0, 1);
         moveObjects(objectsToMove, 0, 1);
+        addIfMissing(objectsToMove, movedObjects);
       } while(objectsToMove.length !== 0);
     });
   }
@@ -272,12 +273,57 @@ function createGameBoard(layout) {
     }
   }
 
+  // TODO: Optimize
+  // TODO: Multiple spawn points triggering at the same time
+  function spawnAll(spawnLocations) {
+    var lookup = {};
+    var spawnableObjects = [];
+    objects.forEach(function(object) {
+      if (object.color) {
+        object.coordinates.forEach(function(coordinates) {
+          lookup[coordinates.x + ',' + coordinates.y] = object;
+        });
+      }
+      if (object.spawnColor) {
+        spawnableObjects.push(object);
+      }
+    });
+    var spawned = false;
+    spawnableObjects.forEach(function(object) {
+      object.coordinates.forEach(function(coordinates) {
+        var key = coordinates.x + ',' + (coordinates.y - 1);
+        var ontop = lookup[key];
+        if (spawnLocations[key] && ontop && (object.spawnColor === ontop.color)) {
+          var objectsToMove = canMove(ontop, 0, -1);
+          if (objectsToMove.length > 0) {
+            spawned = true;
+            moveObjects(objectsToMove, 0, -1);
+            addObject(createJelly(coordinates.x, coordinates.y - 1, object.spawnColor));
+          }
+        }
+      });
+    });
+    if (spawned) {
+      mergeAll();
+    }
+  }
+
   function slide(object, dx) {
     var objectsToMove = canMove(object, dx, 0);
+    if (objectsToMove.length === 0) {
+      return false;
+    }
     moveObjects(objectsToMove, dx, 0);
-    gravityAll();
+    gravityAll(objectsToMove);
+    var spawnLocations = {};
+    objectsToMove.forEach(function(object) {
+      object.coordinates.forEach(function(coordinates) {
+        spawnLocations[coordinates.x + ',' + coordinates.y] = true;
+      });
+    });
     mergeAll();
-    return (objectsToMove.length !== 0);
+    spawnAll(spawnLocations);
+    return true;
   }
 
   // TODO: Optimize
@@ -327,6 +373,27 @@ function createGameBoard(layout) {
     });
   }
 
+  function addAttachment(control, x, y, attachments) {
+    var dx = 0;
+    var dy = 0;
+    if (control === 't') {
+      dy = -1;
+    }
+    if (control === 'r') {
+      dx = 1;
+    }
+    if (control === 'b') {
+      dy = 1;
+    }
+    if (control === 'l') {
+      dx = -1;
+    }
+    attachments.push({
+      src: x + ',' + y,
+      dest: (x + dx) + ',' + (y + dy)
+    });
+  }
+
   function constructRow(row, y, objectLookup, attachments) {
     var parts = row.split(/(?:)/);
     for (var i = 0; i < parts.length; i += 2) {
@@ -350,24 +417,11 @@ function createGameBoard(layout) {
       if (control === ' ') {
         continue;
       }
-      var dx = 0;
-      var dy = 0;
-      if (control === 't') {
-        dy = -1;
+      if (object.type === WALL) {
+        object.spawnColor = control;
+      } else {
+        addAttachment(control, x, y, attachments);
       }
-      if (control === 'r') {
-        dx = 1;
-      }
-      if (control === 'b') {
-        dy = 1;
-      }
-      if (control === 'l') {
-        dx = -1;
-      }
-      attachments.push({
-        src: x + ',' + y,
-        dest: (x + dx) + ',' + (y + dy)
-      });
     }
   }
 

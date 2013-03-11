@@ -8,7 +8,7 @@ function check(layout, solution, callback) {
   function iterate() {
     if (index === solution.length) {
       return callback(undefined, {
-        valid: gameBoard.complete(),
+        valid: gameBoard.solved(),
         moves: moves
       });
     }

@@ -80,7 +80,7 @@ function verifyLevel(req, res, next) {
       // TODO wait for saves? okay if they fail?
 
       // TODO Convert to findAndModify
-      if (result.moves < level.moves) {
+      if ((level.moves === 0) || (result.moves < level.moves)) {
         level.solution = JSON.stringify(solution);
         level.moves = result.moves;
         level.save();

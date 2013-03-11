@@ -869,6 +869,21 @@ var levels = [
       createMove(11, 5, false),
       createMove(11, 4, false)
     ]
+  }, {
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x             x           x ',
+      'x             x           x ',
+      'x             x           x ',
+      'x             gt          x ',
+      'x                 g b     x ',
+      'x x x x           x x     x ',
+      'x x x r   b           r   x ',
+      'x x x x   x x xrx x x x x x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
   }
 ];
 

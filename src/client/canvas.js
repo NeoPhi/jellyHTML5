@@ -93,6 +93,10 @@ function drawObject(object, lookup, doConnect, context) {
     var x = coordinates.x;
     var y = coordinates.y;
     roundedRect(context, (x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), HEIGHT - (MARGIN * 2), RADIUS);
+    if (object.spawnColor) {
+      setFillStyle(object.spawnColor, context);
+      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), RADIUS);
+    }
   });
   if (doConnect) {
     drawConnections(object, lookup, context);

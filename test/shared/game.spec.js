@@ -195,6 +195,49 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
+  it('spawns new jellies', function() {
+    var gameBoard = game.createGameBoard([
+      '  r ',
+      'xrx '
+    ]);
+    expect(gameBoard.move(1, 0, true)).toBe(true);
+    verifyObjects([
+      createJelly([0, 0], [0, -1]),
+      createWall([0, 1]),
+      createWall([1, 1])
+    ], gameBoard.getObjects());
+  });
+
+  it('only spawns when it can', function() {
+    var gameBoard = game.createGameBoard([
+      'x ',
+      '  r ',
+      'xrx '
+    ]);
+    expect(gameBoard.move(1, 1, true)).toBe(true);
+    verifyObjects([
+      createWall([0, 0]),
+      createJelly([0, 1]),
+      createWall([0, 2]),
+      createWall([1, 2])
+    ], gameBoard.getObjects());
+  });
+
+  it('only spawns objects that moved', function() {
+    var gameBoard = game.createGameBoard([
+      'r g  ',
+      'xrx x '
+    ]);
+    expect(gameBoard.move(1, 0, false)).toBe(true);
+    verifyObjects([
+      createJelly([0, 0]),
+      createJelly([2, 0]),
+      createWall([0, 1]),
+      createWall([1, 1]),
+      createWall([2, 1])
+    ], gameBoard.getObjects());
+  });
+
   it('creates complex level', function() {
     var gameBoard = game.createGameBoard([
       'x x x x x x x x x x x x x x ',
