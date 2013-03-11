@@ -230,6 +230,9 @@ function loadLevels(state) {
   state.window.$.ajax({
     url: '/levels/',
     success: function(levels) {
+      levels.sort(function(a, b) {
+        return a.index - b.index;
+      });
       state.window.$('#levels').html(function() {
         return levels.map(function(level) {
           return renderLevel(state, level);

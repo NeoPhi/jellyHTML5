@@ -38,6 +38,7 @@ function createMove(x, y, left) {
 var levels = [
   {
     name: 'Level 1',
+    index: 1,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -68,6 +69,7 @@ var levels = [
     ]
   }, {
     name: 'Level 2',
+    index: 2,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -96,6 +98,7 @@ var levels = [
     ]
   }, {
     name: 'Level 3',
+    index: 3,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -132,6 +135,7 @@ var levels = [
     ]
   }, {
     name: 'Level 4',
+    index: 4,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -192,6 +196,7 @@ var levels = [
     ]
   }, {
     name: 'Level 5',
+    index: 5,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -238,6 +243,7 @@ var levels = [
     ]
   }, {
     name: 'Level 6',
+    index: 6,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x             x ',
@@ -280,6 +286,7 @@ var levels = [
     ]
   }, {
     name: 'Level 7',
+    index: 7,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -312,6 +319,7 @@ var levels = [
     ]
   }, {
     name: 'Level 8',
+    index: 8,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x   x     x   x x x x ',
@@ -368,6 +376,7 @@ var levels = [
     ]
   }, {
     name: 'Level 9',
+    index: 9,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -408,6 +417,7 @@ var levels = [
     ]
   }, {
     name: 'Level 10',
+    index: 10,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x       g r               x ',
@@ -454,6 +464,7 @@ var levels = [
     ]
   }, {
     name: 'Level 11',
+    index: 11,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x             yrl0l0yl  y x ',
@@ -495,6 +506,7 @@ var levels = [
     ]
   }, {
     name: 'Level 12',
+    index: 12,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x r   r r     r r   r x x ',
@@ -539,6 +551,7 @@ var levels = [
     ]
   }, {
     name: 'Level 13',
+    index: 13,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x x x x x x x x ',
@@ -560,6 +573,7 @@ var levels = [
     ]
   }, {
     name: 'Level 14',
+    index: 14,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x x x       r x ',
@@ -634,6 +648,7 @@ var levels = [
     ]
   }, {
     name: 'Level 15',
+    index: 15,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x r   r   r             r x ',
@@ -685,6 +700,7 @@ var levels = [
     ]
   }, {
     name: 'Level 16',
+    index: 16,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x       l0l0l0l1l2l3l3r x ',
@@ -720,6 +736,7 @@ var levels = [
     ]
   }, {
     name: 'Level 17',
+    index: 17,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x l0l0l0x x x g b   x ',
@@ -772,6 +789,7 @@ var levels = [
     ]
   }, {
     name: 'Level 18',
+    index: 18,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -826,6 +844,7 @@ var levels = [
     ]
   }, {
     name: 'Level 19',
+    index: 19,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x grl0        grl2glx     x ',
@@ -872,6 +891,7 @@ var levels = [
     ]
   }, {
     name: 'Level 20',
+    index: 20,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x r r r r       r g g x x x ',
@@ -917,6 +937,7 @@ var levels = [
     ]
   }, {
     name: 'Level 21',
+    index: 21,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x             x           x ',
@@ -933,6 +954,7 @@ var levels = [
     ]
   }, {
     name: 'Level 22',
+    index: 22,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -949,6 +971,7 @@ var levels = [
     ]
   }, {
     name: 'Level 23',
+    index: 23,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -965,6 +988,7 @@ var levels = [
     ]
   }, {
     name: 'Level 24',
+    index: 24,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x g       b           x x x ',
@@ -981,6 +1005,7 @@ var levels = [
     ]
   }, {
     name: 'Level 25',
+    index: 25,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x x x x x x x x     x     x ',

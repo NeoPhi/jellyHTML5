@@ -10,6 +10,11 @@ var LevelSchema = mongoose.Schema({
     type: String,
     required: true
   },
+  index: {
+    type: Number,
+    required: true,
+    unique: true
+  },
   layout: {
     type: String,
     required: true,
@@ -30,6 +35,7 @@ function toClient(summary, status) {
   var result = {
     id: this.id.toString(),
     name: this.name,
+    index: this.index,
     moves: this.moves
   };
   if (!summary) {
