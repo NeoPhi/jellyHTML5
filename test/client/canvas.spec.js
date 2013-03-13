@@ -74,9 +74,9 @@ describe('client/canvas', function() {
       id: '123',
       layout: [
         'x x x x x x x x x x x x x x ',
-        'x grl0        grl2glx     x ',
-        'x   l1gl        l2  x     x ',
-        'x l3l3l3        l4  x     x ',
+        'x gr0         gr2 glx     x ',
+        'x   1 gl        2   x     x ',
+        'x 3 3 3         4   x     x ',
         'x gt  gt      g gtg       x ',
         'x x x           x x x     x ',
         'x x x           x x x     x ',
@@ -250,5 +250,13 @@ describe('client/canvas', function() {
       createMove(8, 8, true)
     ];
     playLevel(moves);
+  });
+
+  it('plays level with spawn points', function() {
+    level.layout = [
+      '  r g ',
+      'xRx x '
+    ];
+    playLevel([createMove(1, 0, true)]);
   });
 });

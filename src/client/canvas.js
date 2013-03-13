@@ -34,20 +34,17 @@ function drawConnections(object, lookup, context) {
   });
 }
 
+var COLORS = {
+  r: 'rgb(255,0,0)',
+  g: 'rgb(0,255,0)',
+  b: 'rgb(0,0,255)',
+  y: 'rgb(256,208,32)',
+  l: 'rgb(128,0,128)',
+  x: 'rgb(128,128,128)'
+};
+
 function setFillStyle(color, context) {
-  if (color === 'r') {
-    context.fillStyle = 'rgb(255,0,0)';
-  } else if (color === 'g') {
-    context.fillStyle = 'rgb(0,255,0)';
-  } else if (color === 'b') {
-    context.fillStyle = 'rgb(0,0,255)';
-  } else if (color === 'y') {
-    context.fillStyle = 'rgb(256,208,32)';
-  } else if (color.charAt(0) === 'l') {
-    context.fillStyle = 'rgb(128,0,128)';
-  } else {
-    throw new Error('Unknown color: ' + color);
-  }
+  context.fillStyle = COLORS[color];
 }
 
 function drawAttachment(state, object) {
@@ -86,20 +83,20 @@ function drawAttachment(state, object) {
 }
 
 function drawObject(object, lookup, doConnect, context) {
-  object.coordinates.forEach(function(coordinates) {
-    lookup[coordinates.x + ',' + coordinates.y] = true;
-  });
+  setFillStyle(object.color, context);
   object.coordinates.forEach(function(coordinates) {
     var x = coordinates.x;
     var y = coordinates.y;
+    lookup[x + ',' + y] = true;
     roundedRect(context, (x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), HEIGHT - (MARGIN * 2), RADIUS);
-    if (object.spawnColor) {
-      setFillStyle(object.spawnColor, context);
+    if (coordinates.spawn.color) {
+      setFillStyle(coordinates.spawn.color, context);
       var spacing = RADIUS / 2;
       context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), spacing);
-      if (object.spawnFixed) {
+      if (coordinates.spawn.fixed) {
         context.fillRect((x * WIDTH) + (spacing * 3), (y * HEIGHT) + MARGIN, spacing * 2, spacing * 2);
       }
+      setFillStyle(object.color, context);
     }
   });
   if (doConnect) {
@@ -115,10 +112,7 @@ function drawGameBoard(state) {
   state.gameBoard.getObjects().forEach(function(object) {
     var lookup = {};
     var doConnect = true;
-    if (object.color) {
-      setFillStyle(object.color, context);
-    } else {
-      context.fillStyle = 'rgb(128,128,128)';
+    if (object.type === game.WALL) {
       lookup = wallLookup;
       doConnect = false;
       walls.push(object);
@@ -132,7 +126,7 @@ function drawGameBoard(state) {
     if (!object.attachments || (object.attachments.length === 0)) {
       return;
     }
-    if (object.color.charAt(0) === 'l') {
+    if (object.color === 'l') {
       return;
     }
     drawAttachment(state, object);
@@ -303,6 +297,7 @@ function render(window) {
         slideObject(state, translateClick(this, event, false));
       }
     }).swipe({
+      // TODO add unit test for swipe
       swipe: function(event, direction, distance) {
         // TODO Does event.preventDefault() work here?
         ignoreClick = true;

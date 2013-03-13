@@ -226,7 +226,7 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
-  it('only spawns objects that moved', function() {
+  it('only spawns jelly that moved', function() {
     var gameBoard = game.createGameBoard([
       'r g  ',
       'xrx x '
@@ -241,7 +241,7 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
-  it('spawns fixed object', function() {
+  it('spawns fixed jelly', function() {
     var gameBoard = game.createGameBoard([
       '  r g ',
       'xRx x '
@@ -257,12 +257,28 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
+  it('spawns jelly on purple', function() {
+    var gameBoard = game.createGameBoard([
+      'r  ',
+      '0 0r',
+      'x x '
+    ]);
+    expect(gameBoard.move(0, 0, false)).toBe(true);
+    expect(gameBoard.solved()).toBe(true);
+    verifyObjects([
+      createJelly([1, 0], [1, -1]),
+      createJelly([0, 1], [1, 1]),
+      createWall([0, 2]),
+      createWall([1, 2])
+    ], gameBoard.getObjects());
+  });
+
   it('creates complex level', function() {
     var gameBoard = game.createGameBoard([
       'x x x x x x x x x x x x x x ',
-      'x grl0        grl2glx     x ',
-      'x   l1gl        l2  x     x ',
-      'x l3l3l3        l4  x     x ',
+      'x gr0         gr2 glx     x ',
+      'x   1 gl        2   x     x ',
+      'x 3 3 3         4   x     x ',
       'x gt  gt      g gtg       x ',
       'x x x           x x x     x ',
       'x x x           x x x     x ',

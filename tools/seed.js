@@ -10,6 +10,7 @@ var email = 'tatsunami.qrostar@gmail.com';
 /*
 , {
     name: 'Level ',
+    index: ,
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
@@ -421,7 +422,7 @@ var levels = [
     layout: [
       'x x x x x x x x x x x x x x ',
       'x       g r               x ',
-      'x       l0l0  l1          x ',
+      'x       0 0   1           x ',
       'x         x   x   x x x x x ',
       'x                         x ',
       'x     x     x             x ',
@@ -467,10 +468,10 @@ var levels = [
     index: 11,
     layout: [
       'x x x x x x x x x x x x x x ',
-      'x             yrl0l0yl  y x ',
+      'x             yr0 0 yl  y x ',
       'x               x x x   x x ',
       'x                       y x ',
-      'x l1l1                  x x ',
+      'x 1 1                   x x ',
       'x x x                     x ',
       'x               y         x ',
       'x       x   x x x       ybx ',
@@ -579,10 +580,10 @@ var levels = [
       'x x x x x x x x x       r x ',
       'x x x x x x x x x       g x ',
       'x x x x x x x x x       g x ',
-      'x l0l0l1l1              g x ',
-      'x l0l0l1l1              g x ',
-      'x l2l2l3l3            x x x ',
-      'x l2l2l3l3            x x x ',
+      'x 0 0 1 1               g x ',
+      'x 0 0 1 1               g x ',
+      'x 2 2 3 3             x x x ',
+      'x 2 2 3 3             x x x ',
       'x x rb  x   gbx x x   x x x ',
       'x x x x x x x x x x x x x x '
     ],
@@ -703,9 +704,9 @@ var levels = [
     index: 16,
     layout: [
       'x x x x x x x x x x x x x x ',
-      'x x       l0l0l0l1l2l3l3r x ',
-      'x x       l0l4l1l1l2l3l3x x ',
-      'x x       l4l4l4l1l2l2x x x ',
+      'x x       0 0 0 1 2 3 3 r x ',
+      'x x       0 4 1 1 2 3 3 x x ',
+      'x x       4 4 4 1 2 2 x x x ',
       'x x           x x x x x x x ',
       'x rt          x x x x x x x ',
       'x x           x x x x x x x ',
@@ -739,11 +740,11 @@ var levels = [
     index: 17,
     layout: [
       'x x x x x x x x x x x x x x ',
-      'x x x x l0l0l0x x x g b   x ',
-      'x x x x l0          b g   x ',
-      'x x x x l0        l1l1x x x ',
-      'x x x x l0l0l0x x x x x x x ',
-      'x   l2l2l2    x x x x x x x ',
+      'x x x x 0 0 0 x x x g b   x ',
+      'x x x x 0           b g   x ',
+      'x x x x 0         1 1 x x x ',
+      'x x x x 0 0 0 x x x x x x x ',
+      'x   2 2 2     x x x x x x x ',
       'x x x x           x x gtx x ',
       'x x x x       g         btx ',
       'x x x x       x           x ',
@@ -793,9 +794,9 @@ var levels = [
     layout: [
       'x x x x x x x x x x x x x x ',
       'x                         x ',
-      'x b l0l1                  x ',
-      'x b l0y y           y     x ',
-      'x b l0l2l3          y l4bbx ',
+      'x b 0 1                   x ',
+      'x b 0 y y           y     x ',
+      'x b 0 2 3           y 4 bbx ',
       'x x x x x   y       x x x x ',
       'x x x x x   y y     x x x x ',
       'x x x x x   y y y   x x x x ',
@@ -847,9 +848,9 @@ var levels = [
     index: 19,
     layout: [
       'x x x x x x x x x x x x x x ',
-      'x grl0        grl2glx     x ',
-      'x   l1gl        l2  x     x ',
-      'x l3l3l3        l4  x     x ',
+      'x gr0         gr2 glx     x ',
+      'x   1 gl        2   x     x ',
+      'x 3 3 3         4   x     x ',
       'x gt  gt      g gtg       x ',
       'x x x           x x x     x ',
       'x x x           x x x     x ',
@@ -1012,11 +1013,28 @@ var levels = [
       'x x x x x x x x     rt    x ',
       'x x x x x x x x           x ',
       'x x x x x           r     x ',
-      'x x l0l0l0        l1l1l1  x ',
-      'x   l0l0l0        l1l1l1  x ',
+      'x x 0 0 0         1 1 1   x ',
+      'x   0 0 0         1 1 1   x ',
       'x   g                 x   x ',
       'x x x x xgx x xgx x xgx x x ',
       'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
+  }, {
+    name: 'Level 26',
+    index: 26,
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x x                 x x x x ',
+      'x x     r           x x x x ',
+      'x x 0 0 0 0 0 0r0 0 x x x x ',
+      'x x           r       x x x ',
+      'x x 1 1 1r1 1 1 1 1   x x x ',
+      'x x     r             x x x ',
+      'x x 2 2 2 2 2 2r2 2 x x x x ',
+      'x x           r     x x x x ',
+      'x x x x xrx x x x x x x x x '
     ],
     solution: [
     ]

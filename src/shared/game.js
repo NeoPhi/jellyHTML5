@@ -8,7 +8,8 @@ function transposeCoordinates(coordinates, dx, dy) {
   return coordinates.map(function(coordinates) {
     return {
       x: coordinates.x + dx,
-      y: coordinates.y + dy
+      y: coordinates.y + dy,
+      spawn: coordinates.spawn
     };
   });
 }
@@ -29,14 +30,20 @@ function addIfMissing(src, dest) {
   });
 }
 
-function createJelly(x, y, color) {
+function createCoordinates(x, y) {
+  return {
+    x: x,
+    y: y,
+    spawn: {
+    }
+  };
+}
+
+function createJelly(color, family) {
   var jelly;
 
-  function addCoordinates(x, y) {
-    jelly.coordinates.push({
-      x: x,
-      y: y
-    });
+  function addCoordinates(coordinates) {
+    jelly.coordinates.push(coordinates);
   }
 
   function affected() {
@@ -73,7 +80,7 @@ function createJelly(x, y, color) {
   }
 
   function merges(object, testCoordinates) {
-    if (object.color !== jelly.color) {
+    if (object.family !== jelly.family) {
       return false;
     }
     return collides(testCoordinates);
@@ -81,7 +88,7 @@ function createJelly(x, y, color) {
 
   function merge(object) {
     object.coordinates.forEach(function(coordinates) {
-      addCoordinates(coordinates.x, coordinates.y);
+      addCoordinates(coordinates);
     });
     addIfMissing(object.attachments, jelly.attachments);
     object.attachments.forEach(function(attachment) {
@@ -117,22 +124,24 @@ function createJelly(x, y, color) {
     move: move,
     collides: collides,
     color: color,
+    family: family,
     mergable: mergable,
     merge: merge,
     merges: merges
   };
-  addCoordinates(x, y);
+
   return jelly;
 }
 
-function createWall(x, y) {
-  var coordinates = [{
-    x: x,
-    y: y
-  }];
+function createWall() {
+  var wall;
+
+  function addCoordinates(coordinates) {
+    wall.coordinates.push(coordinates);
+  }
 
   function collides(testCoordinates) {
-    return overlappingCoordinates(coordinates, testCoordinates);
+    return overlappingCoordinates(wall.coordinates, testCoordinates);
   }
 
   function movable() {
@@ -143,13 +152,17 @@ function createWall(x, y) {
     return false;
   }
 
-  return {
+  wall = {
     type: WALL,
+    color: 'x',
     movable: movable,
     collides: collides,
     mergable: mergable,
-    coordinates: coordinates
+    coordinates: [],
+    addCoordinates: addCoordinates
   };
+
+  return wall;
 }
 
 // Layout specification:
@@ -157,13 +170,12 @@ function createWall(x, y) {
 // Each element is two characters:
 // First is type:
 //   r,g,b,y are mergable jellies
-//   l is a unmergable jelly
+//   0-9 is an unmergable jelly
 //   x is a wall
 //   space is an open space
 // Second is control:
 //   for r,g,b,y it is either blank or t,l,b,r to indicate fixed to direction
-//   for l it is the grouping code 0-9
-//   for x it is either blank or r,g,b,y to indicate spawn color (capatilize to spawn fixed)
+//   for 0-9,x it is either blank or r,g,b,y to indicate spawn color (capatilize to spawn fixed)
 function createGameBoard(layout) {
   var objects = [];
 
@@ -289,37 +301,39 @@ function createGameBoard(layout) {
   // TODO: Multiple spawn points triggering at the same time
   function spawnAll(spawnLocations) {
     var lookup = {};
-    var spawnableObjects = [];
+    var spawners = [];
     objects.forEach(function(object) {
-      if (object.color) {
-        object.coordinates.forEach(function(coordinates) {
-          lookup[coordinates.x + ',' + coordinates.y] = object;
-        });
-      }
-      if (object.spawnColor) {
-        spawnableObjects.push(object);
-      }
-    });
-    var spawned = false;
-    spawnableObjects.forEach(function(object) {
       object.coordinates.forEach(function(coordinates) {
-        var key = coordinates.x + ',' + (coordinates.y - 1);
-        var ontop = lookup[key];
-        if (spawnLocations[key] && ontop && (object.spawnColor === ontop.color)) {
-          var objectsToMove = canMove(ontop, 0, -1);
-          if (objectsToMove.length > 0) {
-            spawned = true;
-            moveObjects(objectsToMove, 0, -1);
-            var newJelly = createJelly(coordinates.x, coordinates.y - 1, object.spawnColor);
-            addObject(newJelly);
-            if (object.spawnFixed) {
-              newJelly.attach(object);
-            }
-            // A spawner goes away once spawned
-            delete object.spawnColor;
-          }
+        var position = coordinates.x + ',' + coordinates.y;
+        lookup[position] = object;
+        if (coordinates.spawn.color) {
+          spawners.push({
+            object: object,
+            coordinates: coordinates
+          });
         }
       });
+    });
+    var spawned = false;
+    spawners.forEach(function(spawner) {
+      var key = spawner.coordinates.x + ',' + (spawner.coordinates.y - 1);
+      var spawn = spawner.coordinates.spawn;
+      var ontop = lookup[key];
+      if (spawnLocations[key] && ontop && (spawn.color === ontop.color)) {
+        var objectsToMove = canMove(ontop, 0, -1);
+        if (objectsToMove.length > 0) {
+          spawned = true;
+          moveObjects(objectsToMove, 0, -1);
+          var newJelly = createJelly(spawn.color, spawn.color);
+          newJelly.addCoordinates(createCoordinates(spawner.coordinates.x, spawner.coordinates.y - 1));
+          addObject(newJelly);
+          if (spawn.fixed) {
+            newJelly.attach(spawner.object, spawner.object.movable());
+          }
+          // A spawner goes away once spawned
+          spawner.coordinates.spawn = {};
+        }
+      }
     });
     if (spawned) {
       mergeAll();
@@ -378,18 +392,22 @@ function createGameBoard(layout) {
   }
 
   function solved() {
-    var colors = {};
+    var families = {};
     return getObjects().every(function(object) {
-      if (object.spawnColor) {
+      // TODO optimize
+      var noSpawners = object.coordinates.every(function(coordinates) {
+        return !coordinates.spawn.hasOwnProperty('color');
+      });
+      if (!noSpawners) {
         return false;
       }
       if (!object.mergable()) {
         return true;
       }
-      if (object.color in colors) {
+      if (object.family in families) {
         return false;
       }
-      colors[object.color] = 1;
+      families[object.family] = 1;
       return true;
     });
   }
@@ -414,33 +432,39 @@ function createGameBoard(layout) {
       dest: (x + dx) + ',' + (y + dy)
     });
   }
+  function purpleJelly(type) {
+    var value = parseInt(type, 10);
+    return ((value >= 0) && (value <= 9));
+  }
 
   function constructRow(row, y, objectLookup, attachments) {
     var parts = row.split(/(?:)/);
     for (var i = 0; i < parts.length; i += 2) {
-      var letter = parts[i];
+      var type = parts[i];
       var control = parts[i + 1];
       var x = Math.floor(i / 2);
-      if (letter === ' ') {
+      if (type === ' ') {
         continue;
       }
       var object;
-      if (letter === 'x') {
-        object = createWall(x, y);
-      } else if (letter === 'l') {
-        object = createJelly(x, y, letter + control);
-        control = ' ';
+      var purple = purpleJelly(type);
+      if (purple) {
+        object = createJelly('l', type);
+      } else if (type === 'x') {
+        object = createWall();
       } else {
-        object = createJelly(x, y, letter);
+        object = createJelly(type, type);
       }
+      var coordinates = createCoordinates(x, y);
+      object.addCoordinates(coordinates);
       addObject(object);
       objectLookup[x + ',' + y] = object;
       if (control === ' ') {
         continue;
       }
-      if (object.type === WALL) {
-        object.spawnColor = control.toLowerCase();
-        object.spawnFixed = (control !== object.spawnColor);
+      if (purple || (object.type === WALL)) {
+        coordinates.spawn.color = control.toLowerCase();
+        coordinates.spawn.fixed = (control !== coordinates.spawn.color);
       } else {
         addAttachment(control, x, y, attachments);
       }

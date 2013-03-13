@@ -30,7 +30,8 @@
     "describe": false,
     "spyOn": false,
     "jasmine": false,
-    "waitsFor": false
+    "waitsFor": false,
+    "process": false
    },
 
   // ************************************************************
