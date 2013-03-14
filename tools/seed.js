@@ -1038,6 +1038,23 @@ var levels = [
     ],
     solution: [
     ]
+  }, {
+    name: 'Level 27',
+    index: 27,
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x x x x x gtx ytx rtx x x x ',
+      'x x x x x           x x x x ',
+      'x b y g 0           r     x ',
+      'x x x x x           x x   x ',
+      'x x x x x 1 1 1 1 1 x x   x ',
+      'x x x x x 1 1 1 1 1   x   x ',
+      'x x x x   1 1 1 1 1 blx   x ',
+      'x             b           x ',
+      'x x x x x x xbx xbx x x x x '
+    ],
+    solution: [
+    ]
   }
 ];
 
