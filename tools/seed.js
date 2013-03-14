@@ -1055,7 +1055,25 @@ var levels = [
     ],
     solution: [
     ]
+  }, {
+    name: 'Level 28',
+    index: 28,
+    layout: [
+      'x x x x x x x x x x x x x x ',
+      'x x x x   x     x   x x x x ',
+      'x x x   g b     g b   x x x ',
+      'x x     x x     x x     x x ',
+      'x x       bt    gt      x x ',
+      'x x                     x x ',
+      'x x x                 x x x ',
+      'x x x x g         b x x x x ',
+      'x x x x x xBx x xGx x x x x ',
+      'x x x x x x x x x x x x x x '
+    ],
+    solution: [
+    ]
   }
+
 ];
 
 function createLevels(user, callback) {
