@@ -9,7 +9,8 @@ function transposeCoordinates(coordinates, dx, dy) {
     return {
       x: coordinates.x + dx,
       y: coordinates.y + dy,
-      spawn: coordinates.spawn
+      spawners: coordinates.spawners,
+      attachments: coordinates.attachments
     };
   });
 }
@@ -34,8 +35,8 @@ function createCoordinates(x, y) {
   return {
     x: x,
     y: y,
-    spawn: {
-    }
+    spawners: [],
+    attachments: []
   };
 }
 
@@ -226,7 +227,7 @@ function createGameBoard(layout) {
     });
   }
 
-  function gravityAll(movedObjects) {
+  function gravityAll() {
     var movableObjects = objects.filter(function(object) {
       return object.movable();
     });
@@ -235,7 +236,6 @@ function createGameBoard(layout) {
       do {
         objectsToMove = canMove(object, 0, 1);
         moveObjects(objectsToMove, 0, 1);
-        addIfMissing(objectsToMove, movedObjects);
       } while(objectsToMove.length !== 0);
     });
   }
@@ -299,45 +299,52 @@ function createGameBoard(layout) {
 
   // TODO: Optimize
   // TODO: Multiple spawn points triggering at the same time
-  function spawnAll(spawnLocations) {
+  function spawnAll() {
     var lookup = {};
-    var spawners = [];
+    var targets = [];
     objects.forEach(function(object) {
       object.coordinates.forEach(function(coordinates) {
         var position = coordinates.x + ',' + coordinates.y;
         lookup[position] = object;
-        if (coordinates.spawn.color) {
-          spawners.push({
+        coordinates.spawners.forEach(function(spawner) {
+          if (spawner.activated) {
+            return;
+          }
+          targets.push({
             object: object,
-            coordinates: coordinates
+            coordinates: coordinates,
+            spawner: spawner
           });
-        }
+        });
       });
     });
     var spawned = false;
-    spawners.forEach(function(spawner) {
-      var key = spawner.coordinates.x + ',' + (spawner.coordinates.y - 1);
-      var spawn = spawner.coordinates.spawn;
-      var ontop = lookup[key];
-      if (spawnLocations[key] && ontop && (spawn.color === ontop.color)) {
-        var objectsToMove = canMove(ontop, 0, -1);
+    targets.forEach(function(target) {
+      var object = target.object;
+      var coordinates = target.coordinates;
+      var spawner = target.spawner;
+
+      var newX = coordinates.x + spawner.dx;
+      var newY = coordinates.y + spawner.dy;
+      var key = newX + ',' + newY;
+      var destination = lookup[key];
+      if (destination && (spawner.color === destination.color)) {
+        var objectsToMove = canMove(destination, spawner.dx, spawner.dy);
         if (objectsToMove.length > 0) {
           spawned = true;
-          moveObjects(objectsToMove, 0, -1);
-          var newJelly = createJelly(spawn.color, spawn.color);
-          newJelly.addCoordinates(createCoordinates(spawner.coordinates.x, spawner.coordinates.y - 1));
+          moveObjects(objectsToMove, spawner.dx, spawner.dy);
+          var newJelly = createJelly(spawner.color, spawner.color);
+          newJelly.addCoordinates(createCoordinates(newX, newY));
           addObject(newJelly);
-          if (spawn.fixed) {
-            newJelly.attach(spawner.object, spawner.object.movable());
+          if (spawner.fixed) {
+            newJelly.attach(object, object.movable());
           }
           // A spawner goes away once spawned
-          spawner.coordinates.spawn = {};
+          spawner.activated = true;
         }
       }
     });
-    if (spawned) {
-      mergeAll();
-    }
+    return spawned;
   }
 
   function slide(object, dx) {
@@ -347,14 +354,11 @@ function createGameBoard(layout) {
     }
     moveObjects(objectsToMove, dx, 0);
     gravityAll(objectsToMove);
-    var spawnLocations = {};
-    objectsToMove.forEach(function(object) {
-      object.coordinates.forEach(function(coordinates) {
-        spawnLocations[coordinates.x + ',' + coordinates.y] = true;
-      });
-    });
-    mergeAll();
-    spawnAll(spawnLocations);
+    var spawned;
+    do {
+      mergeAll();
+      spawned = spawnAll();
+    } while(spawned);
     return true;
   }
 
@@ -395,10 +399,12 @@ function createGameBoard(layout) {
     var families = {};
     return getObjects().every(function(object) {
       // TODO optimize
-      var noSpawners = object.coordinates.every(function(coordinates) {
-        return !coordinates.spawn.hasOwnProperty('color');
+      var activated = object.coordinates.every(function(coordinates) {
+        return coordinates.spawners.every(function(spawner) {
+          return spawner.activated;
+        });
       });
-      if (!noSpawners) {
+      if (!activated) {
         return false;
       }
       if (!object.mergable()) {
@@ -412,75 +418,122 @@ function createGameBoard(layout) {
     });
   }
 
-  function addAttachment(control, x, y, attachments) {
-    var dx = 0;
-    var dy = 0;
-    if (control === 't') {
-      dy = -1;
-    }
-    if (control === 'r') {
-      dx = 1;
-    }
-    if (control === 'b') {
-      dy = 1;
-    }
-    if (control === 'l') {
-      dx = -1;
-    }
-    attachments.push({
-      src: x + ',' + y,
-      dest: (x + dx) + ',' + (y + dy)
-    });
-  }
   function purpleJelly(type) {
     var value = parseInt(type, 10);
     return ((value >= 0) && (value <= 9));
   }
 
-  function constructRow(row, y, objectLookup, attachments) {
-    var parts = row.split(/(?:)/);
-    for (var i = 0; i < parts.length; i += 2) {
-      var type = parts[i];
-      var control = parts[i + 1];
-      var x = Math.floor(i / 2);
+  var DIRECTIONS = {
+    top: {
+      dx: 0,
+      dy: -1
+    },
+    right: {
+      dx: 1,
+      dy: 0
+    },
+    bottom: {
+      dx: 0,
+      dy: 1
+    },
+    left: {
+      dx: -1,
+      dy: 0
+    }
+  };
+
+  var SPAWN_COLORS = {
+    r: true,
+    g: true,
+    b: true,
+    y: true
+  };
+
+  function addOptions(options, coordinates) {
+    for (var direction in DIRECTIONS) {
+      if (DIRECTIONS.hasOwnProperty(direction)) {
+        var deltas = DIRECTIONS[direction];
+        var option = options[direction];
+        if (option === ' ') {
+          continue;
+        }
+        if (option === 'a') {
+          coordinates.attachments.push({
+            direction: direction,
+            dx: deltas.dx,
+            dy: deltas.dy
+          });
+          continue;
+        }
+        if (SPAWN_COLORS[option.toLowerCase()]) {
+          coordinates.spawners.push({
+            direction: direction,
+            dx: deltas.dx,
+            dy: deltas.dy,
+            color: option.toLowerCase(),
+            fixed: option !== option.toLowerCase()
+          });
+        }
+      }
+    }
+  }
+
+  function createObject(type, x, y) {
+    if (purpleJelly(type)) {
+      return createJelly('l', type);
+    }
+    if (type === 'x') {
+      return createWall();
+    }
+    return createJelly(type, type);
+  }
+
+  function constructGridRow(y, top, middle, bottom) {
+    var topParts = top.split(/(?:)/);
+    var middleParts = middle.split(/(?:)/);
+    var bottomParts = bottom.split(/(?:)/);
+    var numberOfColumns = middleParts.length / 3;
+    var gridRow = [];
+    for (var x = 0; x < numberOfColumns; x += 1) {
+      var offset = x * 3;
+      var type = middleParts[offset + 1];
       if (type === ' ') {
         continue;
       }
-      var object;
-      var purple = purpleJelly(type);
-      if (purple) {
-        object = createJelly('l', type);
-      } else if (type === 'x') {
-        object = createWall();
-      } else {
-        object = createJelly(type, type);
-      }
+
+      var object = createObject(type, x, y);
+      addObject(object);
+      gridRow[x] = object;
+
       var coordinates = createCoordinates(x, y);
       object.addCoordinates(coordinates);
-      addObject(object);
-      objectLookup[x + ',' + y] = object;
-      if (control === ' ') {
-        continue;
-      }
-      if (purple || (object.type === WALL)) {
-        coordinates.spawn.color = control.toLowerCase();
-        coordinates.spawn.fixed = (control !== coordinates.spawn.color);
-      } else {
-        addAttachment(control, x, y, attachments);
-      }
+
+      addOptions({
+        top: topParts[offset + 1],
+        right: middleParts[offset + 2],
+        bottom: bottomParts[offset + 1],
+        left: middleParts[offset]
+      }, coordinates);
     }
+    return gridRow;
   }
 
   function construct(layout) {
     var attachments = [];
     var objectLookup = {};
-    layout.forEach(function(row, y) {
-      constructRow(row, y, objectLookup, attachments);
-    });
-    attachments.forEach(function(attachment) {
-      var src = objectLookup[attachment.src];
-      var dest = objectLookup[attachment.dest];
-      src.attach(dest, dest.movable());
+    var grid = [];
+    var numberOfRows = layout.length / 3;
+    for (var y = 0; y < numberOfRows; y += 1) {
+      var offset = y * 3;
+      grid.push(constructGridRow(y, layout[offset], layout[offset + 1], layout[offset + 2], grid));
+    }
+    objects.forEach(function(object) {
+      object.coordinates.forEach(function(coordinates) {
+        coordinates.attachments.forEach(function(attachment) {
+          var dest = grid[coordinates.y + attachment.dy][coordinates.x + attachment.dx];
+          object.attach(dest, dest.movable());
+        });
+      });
     });
     postSetup();
   }

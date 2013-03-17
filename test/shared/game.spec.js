@@ -66,22 +66,30 @@ describe('shared/game', function() {
 
   it('ignores a move not on an object', function() {
     var gameBoard = game.createGameBoard([
-      'x '
+      '- -',
+      ' x ',
+      '- -'
     ]);
     expect(gameBoard.move(10, 10, false)).toBe(false);
   });
 
   it('ignores a move on a wall', function() {
     var gameBoard = game.createGameBoard([
-      'x '
+      '- -',
+      ' x ',
+      '- -'
     ]);
     expect(gameBoard.move(0, 0, false)).toBe(false);
   });
 
   it('can move a jelly', function() {
     var gameBoard = game.createGameBoard([
-      '  r ',
-      'x x '
+      '- -- -',
+      '    r ',
+      '- -- -',
+      '- -- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.move(1, 0, true)).toBe(true);
     verifyObjects([
@@ -93,8 +101,12 @@ describe('shared/game', function() {
 
   it('merges after move', function() {
     var gameBoard = game.createGameBoard([
-      'r   r ',
-      'x x x '
+      '- -- -- -',
+      ' r     r ',
+      '- -- -- -',
+      '- -- -- -',
+      ' x  x  x ',
+      '- -- -- -'
     ]);
     expect(gameBoard.move(2, 0, true)).toBe(true);
     verifyObjects([
@@ -107,10 +119,18 @@ describe('shared/game', function() {
 
   it('merges two after move', function() {
     var gameBoard = game.createGameBoard([
-      '    r ',
-      '    x ',
-      'r   r ',
-      'x x x '
+      '- -- -- -',
+      '       r ',
+      '- -- -- -',
+      '- -- -- -',
+      '       x ',
+      '- -- -- -',
+      '- -- -- -',
+      ' r     r ',
+      '- -- -- -',
+      '- -- -- -',
+      ' x  x  x ',
+      '- -- -- -'
     ]);
     expect(gameBoard.move(2, 0, true)).toBe(true);
     verifyObjects([
@@ -124,9 +144,15 @@ describe('shared/game', function() {
 
   it('does not move anchored jelly attached to jelly', function() {
     var gameBoard = game.createGameBoard([
-      'bb  ',
-      'r x ',
-      'x x '
+      '- -- -',
+      ' b    ',
+      '-a-- -',
+      '- -- -',
+      ' 0  x ',
+      '- -- -',
+      '- -- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.move(0, 0, false)).toBe(false);
     verifyObjects([
@@ -140,8 +166,12 @@ describe('shared/game', function() {
 
   it('moves series of anchored jellies', function() {
     var gameBoard = game.createGameBoard([
-      'rrb gl',
-      '  x   '
+      '- -- -- -',
+      ' ra 0 ag ',
+      '- -- -- -',
+      '- -- -- -',
+      '    x    ',
+      '- -- -- -'
     ]);
     expect(gameBoard.move(0, 0, false)).toBe(true);
     verifyObjects([
@@ -154,8 +184,12 @@ describe('shared/game', function() {
 
   it('does not move series of anchored jellies', function() {
     var gameBoard = game.createGameBoard([
-      'rbb ',
-      'x x '
+      '- -- -',
+      ' r  b ',
+      '-a-- -',
+      '- -- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.move(1, 0, true)).toBe(false);
     verifyObjects([
@@ -168,8 +202,12 @@ describe('shared/game', function() {
 
   it('does not move a jelly next to a wall', function() {
     var gameBoard = game.createGameBoard([
-      'x r ',
-      'x x '
+      '- -- -',
+      ' x  b ',
+      '- -- -',
+      '- -- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.move(1, 0, true)).toBe(false);
     verifyObjects([
@@ -182,8 +220,12 @@ describe('shared/game', function() {
 
   it('can move a jelly next to another jelly', function() {
     var gameBoard = game.createGameBoard([
-      '  r b ',
-      'x x x '
+      '- -- -- -',
+      '    r  b ',
+      '- -- -- -',
+      '- -- -- -',
+      ' x  x  x ',
+      '- -- -- -'
     ]);
     expect(gameBoard.move(2, 0, true)).toBe(true);
     verifyObjects([
@@ -197,8 +239,12 @@ describe('shared/game', function() {
 
   it('spawns new jellies', function() {
     var gameBoard = game.createGameBoard([
-      '  r ',
-      'xrx '
+      '- -- -',
+      '    r ',
+      '- -- -',
+      '-r-- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.solved()).toBe(false);
     expect(gameBoard.move(1, 0, true)).toBe(true);
@@ -212,9 +258,15 @@ describe('shared/game', function() {
 
   it('only spawns when it can', function() {
     var gameBoard = game.createGameBoard([
-      'x ',
-      '  r ',
-      'xrx '
+      '- -- -',
+      ' x    ',
+      '- -- -',
+      '- -- -',
+      '    r ',
+      '- -- -',
+      '-r-- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.move(1, 1, true)).toBe(true);
     expect(gameBoard.solved()).toBe(false);
@@ -226,25 +278,14 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
-  it('only spawns jelly that moved', function() {
-    var gameBoard = game.createGameBoard([
-      'r g  ',
-      'xrx x '
-    ]);
-    expect(gameBoard.move(1, 0, false)).toBe(true);
-    verifyObjects([
-      createJelly([0, 0]),
-      createJelly([2, 0]),
-      createWall([0, 1]),
-      createWall([1, 1]),
-      createWall([2, 1])
-    ], gameBoard.getObjects());
-  });
-
   it('spawns fixed jelly', function() {
     var gameBoard = game.createGameBoard([
-      '  r g ',
-      'xRx x '
+      '- -- -- -',
+      '    r  g ',
+      '- -- -- -',
+      '-R-- -- -',
+      ' x  x  x ',
+      '- -- -- -'
     ]);
     expect(gameBoard.move(2, 0, true)).toBe(true);
     expect(gameBoard.move(0, 0, false)).toBe(false);
@@ -259,9 +300,15 @@ describe('shared/game', function() {
 
   it('spawns jelly on purple', function() {
     var gameBoard = game.createGameBoard([
-      'r  ',
-      '0 0r',
-      'x x '
+      '- -- -',
+      ' r    ',
+      '- -- -',
+      '- --r-',
+      ' 0  0 ',
+      '- -- -',
+      '- -- -',
+      ' x  x ',
+      '- -- -'
     ]);
     expect(gameBoard.move(0, 0, false)).toBe(true);
     expect(gameBoard.solved()).toBe(true);
@@ -275,16 +322,36 @@ describe('shared/game', function() {
 
   it('creates complex level', function() {
     var gameBoard = game.createGameBoard([
-      'x x x x x x x x x x x x x x ',
-      'x gr0         gr2 glx     x ',
-      'x   1 gl        2   x     x ',
-      'x 3 3 3         4   x     x ',
-      'x gt  gt      g gtg       x ',
-      'x x x           x x x     x ',
-      'x x x           x x x     x ',
-      'x x x           x x x     x ',
-      'x x x                     x ',
-      'x x x x x x x x x x x x x x '
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  x  x  x  x  x  x  x  x  x  x  x  x  x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  ga 0              ga 2 ag  x        x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x     1 ag              2     x        x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  3  3  3              4     x        x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- --a-- --a-- -- -- -- --a-- -- -- -- -- -',
+      ' x  g     g           g  g  g           x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  x  x                 x  x  x        x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  x  x                 x  x  x        x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  x  x                 x  x  x        x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  x  x                                x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',
+      ' x  x  x  x  x  x  x  x  x  x  x  x  x  x ',
+      '- -- -- -- -- -- -- -- -- -- -- -- -- -- -'
     ]);
     expect(gameBoard.getObjects().length).toBe(76);
     expect(gameBoard.solved()).toBe(false);

@@ -4,8 +4,9 @@ var path = require('path');
 var mongoose = require('mongoose');
 var sessions = require('./lib/sessions');
 var levels = require('./lib/levels');
+var config = require('./lib/config');
 
-mongoose.connect(process.env.MONGODB_URL);
+mongoose.connect(config.mongo.url);
 
 var app = express();
 
@@ -34,9 +35,9 @@ app.use(express['static']('static'));
 sessions.addRoutes(app);
 levels.addRoutes(app);
 
-var jsExt = process.env.JS_EXT;
-var cssExt = process.env.CSS_EXT;
-var dailyCredId = process.env.DAILY_CRED_ID;
+var jsExt = config.extension.js;
+var cssExt = config.extension.css;
+var dailyCredId = config.dailyCred.id;
 
 app.get('/', function(req, res){
   res.render('home', {
@@ -47,7 +48,7 @@ app.get('/', function(req, res){
   });
 });
 
-var port = process.env.PORT;
+var port = config.server.port;
 app.listen(port, function(err) {
   if (err) {
     throw err;

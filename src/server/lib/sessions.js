@@ -3,8 +3,9 @@ var passport = require('passport');
 var DailycredStrategy = require('passport-dailycred').Strategy;
 var User = require('../models/user').model;
 var RedisStore = require('connect-redis')(express);
+var config = require('../lib/config');
 
-var redisUrl = require('url').parse(process.env.REDIS_URL);
+var redisUrl = require('url').parse(config.redis.url);
 if (!redisUrl.auth) {
   redisUrl.auth = '';
 }
@@ -12,9 +13,9 @@ if (!redisUrl.auth) {
 var CALLBACK_URL = '/auth/dailycred/callback';
 
 var dailycredStrategy = new DailycredStrategy({
-  clientID: process.env.DAILY_CRED_ID,
-  clientSecret: process.env.DAILY_CRED_SECRET,
-  callbackURL: process.env.URL_BASE + CALLBACK_URL
+  clientID: config.dailyCred.id,
+  clientSecret: config.dailyCred.secret,
+  callbackURL: config.server.url + CALLBACK_URL
 }, function(accessToken, refreshToken, profile, done) {
   User.findByDailyCredId(profile.id, function(err, user) {
     if (err || user) {
@@ -46,7 +47,7 @@ passport.deserializeUser(function(user, done) {
 
 function addMiddleware(app) {
   app.use(express.session({
-    secret: process.env.SESSION_SECRET,
+    secret: config.session.secret,
     key: 'sid',
     store: new RedisStore({
       host: redisUrl.hostname,

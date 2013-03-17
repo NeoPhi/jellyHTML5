@@ -4,10 +4,11 @@ var WIDTH = 40;
 var HEIGHT = 40;
 var MARGIN = 1;
 var RADIUS = 10;
+var SPACING = RADIUS / 2;
 
 // https://developer.mozilla.org/en-US/docs/HTML/Canvas/Tutorial/Drawing_shapes
 
-function roundedRect(context, x, y, width, height, radius){
+function roundedRect(context, x, y, width, height, radius) {
   context.beginPath();
   context.moveTo(x, y + radius);
   context.lineTo(x, y + height - radius);
@@ -52,35 +53,50 @@ function drawAttachment(state, object) {
   object.coordinates.forEach(function(coordinates) {
     var x = coordinates.x;
     var y = coordinates.y;
-    var spacing = RADIUS / 2;
     object.attachments.forEach(function(attachment) {
       if (attachment.collides([{
         x: x + 1,
         y: y
       }])) {
-        state.context.fillRect((x + 1) * WIDTH - spacing, (y * HEIGHT) + (spacing * 3), spacing * 3, spacing * 2);
+        state.context.fillRect((x + 1) * WIDTH - SPACING, (y * HEIGHT) + (SPACING * 3), SPACING * 3, SPACING * 2);
       }
       if (attachment.collides([{
         x: x - 1,
         y: y
       }])) {
-        state.context.fillRect((x * WIDTH) - (spacing * 2), (y * HEIGHT) + (spacing * 3), spacing * 3, spacing * 2);
+        state.context.fillRect((x * WIDTH) - (SPACING * 2), (y * HEIGHT) + (SPACING * 3), SPACING * 3, SPACING * 2);
       }
       if (attachment.collides([{
         x: x,
         y: y + 1
       }])) {
-        state.context.fillRect((x * WIDTH) + (spacing * 3), ((y + 1) * HEIGHT) - spacing, (spacing * 2), (spacing * 3));
+        state.context.fillRect((x * WIDTH) + (SPACING * 3), ((y + 1) * HEIGHT) - SPACING, (SPACING * 2), (SPACING * 3));
       }
       if (attachment.collides([{
         x: x,
         y: y - 1
       }])) {
-        state.context.fillRect((x * WIDTH) + (spacing * 3), (y * HEIGHT) - (spacing * 2), spacing * 2, spacing * 3);
+        state.context.fillRect((x * WIDTH) + (SPACING * 3), (y * HEIGHT) - (SPACING * 2), SPACING * 2, SPACING * 3);
       }
     });
   });
 }
+
+var SPAWNERS = {
+  top: function(x, y, fixed, context) {
+    context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), SPACING);
+    if (fixed) {
+      context.fillRect((x * WIDTH) + (SPACING * 3), (y * HEIGHT) + MARGIN, SPACING * 2, SPACING * 2);
+    }
+  },
+  left: function(x, y, fixed, context) {
+    context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, SPACING, HEIGHT - (MARGIN * 2));
+    if (fixed) {
+      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + (SPACING * 3), SPACING * 2, SPACING * 2);
+    }
+  }
+};
+
 
 function drawObject(object, lookup, doConnect, context) {
   setFillStyle(object.color, context);
@@ -89,15 +105,14 @@ function drawObject(object, lookup, doConnect, context) {
     var y = coordinates.y;
     lookup[x + ',' + y] = true;
     roundedRect(context, (x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), HEIGHT - (MARGIN * 2), RADIUS);
-    if (coordinates.spawn.color) {
-      setFillStyle(coordinates.spawn.color, context);
-      var spacing = RADIUS / 2;
-      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, WIDTH - (MARGIN * 2), spacing);
-      if (coordinates.spawn.fixed) {
-        context.fillRect((x * WIDTH) + (spacing * 3), (y * HEIGHT) + MARGIN, spacing * 2, spacing * 2);
+    coordinates.spawners.forEach(function(spawner) {
+      if (spawner.activated) {
+        return;
       }
+      setFillStyle(spawner.color, context);
+      SPAWNERS[spawner.direction](x, y, spawner.fixed, context);
       setFillStyle(object.color, context);
-    }
+    });
   });
   if (doConnect) {
     drawConnections(object, lookup, context);
