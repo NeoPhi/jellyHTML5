@@ -3,10 +3,11 @@ describe('server/lib/verifier', function() {
   var Level = require('../../../src/server/models/level').model;
   var verifier = require('../../../src/server/lib/verifier');
   var async = require('async');
+  var config = require('../../../src/server/lib/config');
 
   beforeEach(function() {
     var connected = false;
-    mongoose.connect(process.env.MONGODB_URL, function(err) {
+    mongoose.connect(config.mongo.url, function(err) {
       if (err) {
         throw err;
       }

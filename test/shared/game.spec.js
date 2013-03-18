@@ -320,6 +320,31 @@ describe('shared/game', function() {
     ], gameBoard.getObjects());
   });
 
+  it('moves spawner to spawn', function() {
+    var gameBoard = game.createGameBoard([
+      '- -- -- -- -',
+      ' r          ',
+      '- -- -- -- -',
+      '- -- -- -- -',
+      ' x    r0    ',
+      '- -- -- -- -',
+      '- -- -- -- -',
+      ' x  x  x  x ',
+      '- -- -- -- -'
+    ]);
+    expect(gameBoard.move(0, 0, false)).toBe(true);
+    expect(gameBoard.solved()).toBe(true);
+    verifyObjects([
+      createJelly([1, 1], [2, 1]),
+      createJelly([3, 1]),
+      createWall([0, 1]),
+      createWall([0, 2]),
+      createWall([1, 2]),
+      createWall([2, 2]),
+      createWall([3, 2])
+    ], gameBoard.getObjects());
+  });
+
   it('creates complex level', function() {
     var gameBoard = game.createGameBoard([
       '- -- -- -- -- -- -- -- -- -- -- -- -- -- -',

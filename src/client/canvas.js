@@ -92,7 +92,13 @@ var SPAWNERS = {
   left: function(x, y, fixed, context) {
     context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + MARGIN, SPACING, HEIGHT - (MARGIN * 2));
     if (fixed) {
-      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + (SPACING * 3), SPACING * 2, SPACING * 2);
+      context.fillRect((x * WIDTH) + MARGIN, (y * HEIGHT) + (SPACING * 2), SPACING * 2, SPACING * 2);
+    }
+  },
+  right: function(x, y, fixed, context) {
+    context.fillRect(((x + 1) * WIDTH) - MARGIN - SPACING, (y * HEIGHT) + MARGIN, SPACING, HEIGHT - (MARGIN * 2));
+    if (fixed) {
+      context.fillRect(((x + 1) * WIDTH) - MARGIN - (SPACING * 2), (y * HEIGHT) + (SPACING * 2), SPACING * 2, SPACING * 2);
     }
   }
 };

@@ -319,7 +319,10 @@ function createGameBoard(layout) {
       });
     });
     var spawned = false;
-    targets.forEach(function(target) {
+
+    // Only loop until the first viable spawner is found
+    for (var i = 0; i < targets.length; i += 1) {
+      var target = targets[i];
       var object = target.object;
       var coordinates = target.coordinates;
       var spawner = target.spawner;
@@ -329,10 +332,19 @@ function createGameBoard(layout) {
       var key = newX + ',' + newY;
       var destination = lookup[key];
       if (destination && (spawner.color === destination.color)) {
-        var objectsToMove = canMove(destination, spawner.dx, spawner.dy);
+        var dx = spawner.dx;
+        var dy = spawner.dy;
+        var objectsToMove = canMove(destination, dx, dy);
+        // Try moving the spawner instead
+        if (objectsToMove.length === 0) {
+          dx *= -1;
+          dy *= -1;
+          newX = coordinates.x;
+          newY = coordinates.y;
+          objectsToMove = canMove(object, dx, dy);
+        }
         if (objectsToMove.length > 0) {
-          spawned = true;
-          moveObjects(objectsToMove, spawner.dx, spawner.dy);
+          moveObjects(objectsToMove, dx, dy);
           var newJelly = createJelly(spawner.color, spawner.color);
           newJelly.addCoordinates(createCoordinates(newX, newY));
           addObject(newJelly);
@@ -341,10 +353,11 @@ function createGameBoard(layout) {
           }
           // A spawner goes away once spawned
           spawner.activated = true;
+          return true;
         }
       }
-    });
-    return spawned;
+    }
+    return false;
   }
 
   function slide(object, dx) {
