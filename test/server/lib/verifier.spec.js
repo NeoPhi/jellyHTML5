@@ -1,7 +1,7 @@
 describe('server/lib/verifier', function() {
   var verifier = require('../../../src/server/lib/verifier');
   var game = require('../../../src/shared/game');
-  
+
   var done;
   var gameBoard;
 

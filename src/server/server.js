@@ -28,9 +28,9 @@ app.set('view options', {
 });
 
 app.configure('development', function(){
-  app.use(express['static']('build'));
+  app.use(express.static('build'));
 });
-app.use(express['static']('static'));
+app.use(express.static('static'));
 
 sessions.addRoutes(app);
 levels.addRoutes(app);

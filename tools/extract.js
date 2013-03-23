@@ -25,7 +25,7 @@ Level.find({}, '+layout +solution', function(err, levels) {
       layout: layout,
       solution: solution
     };
-    
+
     var file = level.index + '.json';
     if (level.index < 10) {
       file = '0' + file;

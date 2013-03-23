@@ -106,7 +106,7 @@
   // if (cond) {
   //   doSomething(); // We used only two spaces for indentation here
   // }
-  "indent": 4,
+  "indent": 2,
 
   // This option prohibits the use of a variable before it was
   // defined. JavaScript has function scope only and, in addition to
