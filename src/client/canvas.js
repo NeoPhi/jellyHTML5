@@ -267,10 +267,16 @@ function loadLevels(state) {
   });
 }
 
-function translateClick(container, event, left) {
-  event.preventDefault();
-  var x = Math.floor((event.pageX - container.offsetLeft) / WIDTH);
-  var y = Math.floor((event.pageY - container.offsetTop) / HEIGHT);
+function extractCoordinates(event) {
+  return {
+    x: event.pageX || event.clientX,
+    y: event.pageY || event.clientY
+  };
+}
+
+function createMove(container, coordinates, left) {
+  var x = Math.floor((coordinates.x - container.offsetLeft) / WIDTH);
+  var y = Math.floor((coordinates.y - container.offsetTop) / HEIGHT);
   return {
     x: x,
     y: y,
@@ -278,20 +284,25 @@ function translateClick(container, event, left) {
   };
 }
 
-function translateSwipe(container, event, distance, left) {
+function translateClick(container, event, left) {
   event.preventDefault();
-  var delta = -distance;
-  if (left) {
-    delta *= -1;
-  }
-  var source = event.changedTouches[0];
-  var x = Math.floor((source.pageX + delta - container.offsetLeft) / WIDTH);
-  var y = Math.floor((source.pageY - container.offsetTop) / HEIGHT);
+  var coordinates = extractCoordinates(event);
+  return createMove(container, coordinates, left);
+}
+
+function translateSwipeCoordinates(container, swipeCoordinates) {
+  var left = (swipeCoordinates.start.x > swipeCoordinates.end.x);
+  return createMove(container, swipeCoordinates.start, left);
+}
+
+function createSwipeCoordinates(event) {
   return {
-    x: x,
-    y: y,
-    left: left
+    start: extractCoordinates(event)
   };
+}
+
+function updateSwipeCoordinates(event, swipeCoordinates) {
+  swipeCoordinates.end = extractCoordinates(event);
 }
 
 function render(window) {
@@ -306,18 +317,21 @@ function render(window) {
     state.context = drawingCanvas[0].getContext('2d');
     loadLevels(state);
 
-    window.$('#board').on('mouseup', function(event) {
-      var right = ((event.button === 2) || ((event.button === 0) && event.ctrlKey));
-      slideObject(state, translateClick(this, event, !right));
-    }).on('contextmenu', function(event) {
+    var swipeCoordinates;
+    window.$('#board').on('contextmenu', function(event) {
       event.preventDefault();
     }).swipe({
-      // TODO add unit test for swipe
-      swipe: function(event, direction, distance) {
-        if ((direction === 'left') || (direction === 'right')) {
-          if (event.changedTouches && (event.changedTouches.length > 0)) {
-            slideObject(state, translateSwipe(this[0], event, distance, (direction === 'left')));
-          }
+      // TODO move unit test
+      swipeStatus: function(event, phase) {
+        if (phase === 'start') {
+          swipeCoordinates = createSwipeCoordinates(event);
+        } else if (phase === 'move') {
+          updateSwipeCoordinates(event, swipeCoordinates);
+        } else if (phase === 'end') {
+          slideObject(state, translateSwipeCoordinates(this[0], swipeCoordinates));
+        } else if (phase === 'cancel') {
+          var right = ((event.button === 2) || ((event.button === 0) && event.ctrlKey));
+          slideObject(state, translateClick(this[0], event, !right));
         }
       },
       threshold: WIDTH / 2

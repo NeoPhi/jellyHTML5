@@ -1,6 +1,7 @@
 function Node() {
   this.eventListeners = {};
   this.classes = {};
+  this.swipeOptions = undefined;
 }
 
 Node.prototype.html = function() {
@@ -20,7 +21,8 @@ Node.prototype.on = function(name, listener) {
   return this;
 };
 
-Node.prototype.swipe = function() {
+Node.prototype.swipe = function(swipeOptions) {
+  this.swipeOptions = swipeOptions;
   return this;
 };
 

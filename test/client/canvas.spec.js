@@ -34,11 +34,11 @@ describe('client/canvas', function() {
       button: move.button,
       preventDefault: function() {}
     };
-    var that = {
+    var that = [{
       offsetLeft: 0,
       offsetTop: 0
-    };
-    board.eventListeners.mouseup.call(that, event);
+    }];
+    board.swipeOptions.swipeStatus.call(that, event, 'cancel');
   }
 
   function playLevel(moves) {
