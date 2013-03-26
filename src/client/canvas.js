@@ -306,22 +306,14 @@ function render(window) {
     state.context = drawingCanvas[0].getContext('2d');
     loadLevels(state);
 
-    var ignoreClick = false;
-    window.$('#board').on('mousedown', function() {
-      ignoreClick = false;
-    }).on('click', function(event) {
-      if (!ignoreClick) {
-        slideObject(state, translateClick(this, event, true));
-      }
+    window.$('#board').on('mouseup', function(event) {
+      var right = ((event.button === 2) || ((event.button === 0) && event.ctrlKey));
+      slideObject(state, translateClick(this, event, !right));
     }).on('contextmenu', function(event) {
-      if (!ignoreClick) {
-        slideObject(state, translateClick(this, event, false));
-      }
+      event.preventDefault();
     }).swipe({
       // TODO add unit test for swipe
       swipe: function(event, direction, distance) {
-        // TODO Does event.preventDefault() work here?
-        ignoreClick = true;
         if ((direction === 'left') || (direction === 'right')) {
           if (event.changedTouches && (event.changedTouches.length > 0)) {
             slideObject(state, translateSwipe(this[0], event, distance, (direction === 'left')));

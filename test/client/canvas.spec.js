@@ -16,14 +16,14 @@ describe('client/canvas', function() {
   var levelTemplate;
 
   function createMove(x, y, left) {
-    var method = 'click';
-    if (!left) {
-      method = 'contextmenu';
+    var button = 2;
+    if (left) {
+      button = 0;
     }
     return {
       x: x,
       y: y,
-      method: method
+      button: button
     };
   }
 
@@ -31,13 +31,14 @@ describe('client/canvas', function() {
     var event = {
       pageX: move.x * 40 + 20,
       pageY: move.y * 40 + 20,
+      button: move.button,
       preventDefault: function() {}
     };
     var that = {
       offsetLeft: 0,
       offsetTop: 0
     };
-    board.eventListeners[move.method].call(that, event);
+    board.eventListeners.mouseup.call(that, event);
   }
 
   function playLevel(moves) {
