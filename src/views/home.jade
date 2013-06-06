@@ -5,100 +5,133 @@ html
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(href="/css/bootstrap-2.3.0#{cssExt}", rel="stylesheet", media="screen")
     style(type="text/css")
+      html,
       body {
+        height: 100%;
+      }
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        margin: 0 auto -60px;
+      }
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+      #wrap > .container-fluid {
         padding-top: 60px;
-        padding-bottom: 40px;
+      }
+      .container .credit {
+        margin: 20px 0;
       }
       .scroll {
-        height: 500px;
+        height: 580px;
         overflow: auto;
       }
     link(href="/css/bootstrap-responsive-2.3.0#{cssExt}", rel="stylesheet", media="screen")
   body
-    div.navbar.navbar-inverse.navbar-fixed-top
-      div.navbar-inner
-        div.container-fluid
-          button.btn.btn-navbar(type="button", data-toggle="collapse", data-target=".nav-collapse")
-            span.icon-bar
-            span.icon-bar
-          p.brand Jelly no Puzzle Clone
-          div.nav-collapse.collapse
-            p.navbar-text.pull-right
-              if user
-                | Welcome #{user.email} 
-                a(href="/auth/signout") Sign Out
-                | .
-              else
-                a(href="/auth/signup") Sign Up
-                |  or 
-                a(href="/auth/signin") Sign In
-                |  to track progress.
-            ul.nav
-              li
-                a(href="https://github.com/NeoPhi/jellyHTML5") About
-              li
-                a(href="https://github.com/NeoPhi/jellyHTML5/issues") Contact
+    div#wrap
+      div.navbar.navbar-inverse.navbar-fixed-top
+        div.navbar-inner
+          div.container-fluid
+            button.btn.btn-navbar(type="button", data-toggle="collapse", data-target=".nav-collapse")
+              span.icon-bar
+              span.icon-bar
+            p.brand Jelly no Puzzle Clone
+            div.nav-collapse.collapse
+              p.navbar-text.pull-right
+                if user
+                  | Welcome #{user.email} 
+                  a(href="/auth/signout") Sign Out
+                  | .
+                else
+                  a(href="/auth/signup") Sign Up
+                  |  or 
+                  a(href="/auth/signin") Sign In
+                  |  to track progress.
+              ul.nav
+                li
+                  a(href="#rules", data-toggle="modal") Rules
+                li
+                  a(href="https://github.com/NeoPhi/jellyHTML5/issues") Feedback
 
-    div.container-fluid
-      div.row-fluid
-        div.span9
-          div.hero-unit
-            div#canvasContext.alert.alert-error.hide
-              p
-                strong Error!
-                |  Unable to render game...
-            h3#title
-            p.pull-right
-              | Move count 
-              span#moveCount 0
-            canvas#board(width="560", height="400")
-              div.alert.alert-error
+      div.container-fluid
+        div.row-fluid
+          div.span9
+            div.hero-unit
+              div#canvasContext.alert.alert-error.hide
                 p
                   strong Error!
-                  |  Your browser doesn't support canvas...
-            br
-            div.btn-group
-              button#reset.btn.btn-primary.disabled Reset
+                  |  Unable to render game...
+              h3#title
+              p.pull-right
+                | Move count 
+                span#moveCount 0
+              canvas#board(width="560", height="400")
+                div.alert.alert-error
+                  p
+                    strong Error!
+                    |  Your browser doesn't support canvas...
+              br
+              div.btn-group
+                button#reset.btn.btn-primary.disabled Reset
 
-        div.span3
-          div#levels.sidebar-nav.scroll.well
+          div.span3
+            div#levels.sidebar-nav.scroll.well
 
-      div.row-fluid
-        div.span12
-          ul
-            li.
-              Clone of <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The original Windows version is much better, play it if you can.
-            li.
-              Goal: Merge all jellies of the same color.
-            li.
-              Controls: Left and right swipes or mouse clicks move jellies.
-            li.
-              Note: Purple jellies don't merge, they are just there to help.
-            li.
-              Note: Some jellies are fixed and can't move.
-            li.
-              Note: Certain spots create new jellies of the same color if there is room and must be used to complete the level.
-
-    hr
-    footer
-      | Brought to by 
-      a(href="http://danielr.neophi.com/") Daniel Rinehart
-      |  under an MIT License.
+    div#footer
+      div.container
+        p.muted.credit
+          | Brought to by 
+          a(href="http://danielr.neophi.com/") Daniel Rinehart
+          |  under an MIT License.
 
     div#levelSolved.modal.hide.fade
       div.modal-header
-          button.close(data-dismiss='modal') ×
-          h3 Congratulations!
-        div.modal-body
-          p Great job solving the level! 
-            if !user
-              a(href="/auth/signup") Sign Up
-              |  or 
-              a(href="/auth/signin") Sign In
-              |  to track progress.
+        button.close(data-dismiss='modal') ×
+        h3 Congratulations!
+      div.modal-body
+        p Great job solving the level! 
+          if !user
+            a(href="/auth/signup") Sign Up
+            |  or 
+            a(href="/auth/signin") Sign In
+            |  to track progress.
+      div.modal-footer
+        button.btn(data-dismiss='modal') Close
 
-        div.modal-footer
-          button.btn(data-dismiss='modal') Close
+    div#rules.modal.hide.fade
+      div.modal-header
+        button.close(data-dismiss='modal') ×
+        h3 Rules
+      div.modal-body
+        ul
+          li.
+            Clone of <a href="http://qrostar.skr.jp/index.cgi?page=jelly&lang=en">Jelly no Puzzle</a>. The original Windows version is much better, play it if you can.
+          li.
+            Goal: Merge all jellies of the same color.
+          li.
+            Controls: Left and right swipes or mouse clicks move jellies.
+          li.
+            Note: Purple jellies don't merge, they are just there to help.
+          li.
+            Note: Some jellies are fixed and can't move.
+          li.
+            Note: Certain spots create new jellies of the same color if there is room and must be used to complete the level.
+      div.modal-footer
+        button.btn(data-dismiss='modal') Close
 
     script(id="levelTemplate",type="text/template").
       <div id="level<%= level.id %>" class="well well-small">

@@ -19,7 +19,7 @@
     "browserify": "2.7.2"
   },
   "scripts": {
-    "pretest": "jshint --config jshint/src.json src/client src/server tools && jshint --config jshint/test.json test",
+    "pretest": "jshint --config jshint/src.json src/client src/server src/shared tools && jshint --config jshint/test.json test",
     "test": "istanbul test jasmine-node -- test",
     "posttest": "browserify src/wrapper/wrapper.js -o build/js/jelly.js",
     "integration": "jshint --config jshint/test.json integration && istanbul test jasmine-node -- integration",

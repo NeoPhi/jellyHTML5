@@ -318,7 +318,6 @@ function createGameBoard(layout) {
         });
       });
     });
-    var spawned = false;
 
     // Only loop until the first viable spawner is found
     for (var i = 0; i < targets.length; i += 1) {
@@ -491,7 +490,7 @@ function createGameBoard(layout) {
     }
   }
 
-  function createObject(type, x, y) {
+  function createObject(type) {
     if (purpleJelly(type)) {
       return createJelly('l', type);
     }
@@ -532,8 +531,6 @@ function createGameBoard(layout) {
   }
 
   function construct(layout) {
-    var attachments = [];
-    var objectLookup = {};
     var grid = [];
     var numberOfRows = layout.length / 3;
     for (var y = 0; y < numberOfRows; y += 1) {
